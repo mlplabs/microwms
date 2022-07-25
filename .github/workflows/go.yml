@@ -51,7 +51,7 @@ jobs:
         run: |
           set -eu
           mkdir "$HOME/.ssh"
-          echo "${{env.SSH_KEY}}" > "$HOME/.ssh/key"
+          echo "$SSH_KEY" > "$HOME/.ssh/key"
           chmod 600 "$HOME/.ssh/key"
-          rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . ${{HOSTNAME}}:/home/mike/deploy_mwms
-          ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no ${{HOSTNAME}} chmod +x deploy_mwms/build/mwms
+          rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . $HOSTNAME:/home/mike/deploy_mwms
+          ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no $HOSTNAME chmod +x deploy_mwms/build/mwms

@@ -19,6 +19,9 @@ jobs:
     - name: Test
       run: go test -v ./...
 
+    - name: Build
+      run: mkdir builds && go build -o builds/mwms
+
   deploy:
     env:
       SSH_KEY: ${{secrets.DEPLOY_KEY_FOR_VDS}}

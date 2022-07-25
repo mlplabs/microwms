@@ -26,6 +26,7 @@ func main() {
 	wHandlers := new(routes.WrapHttpHandlers)
 	wHandlers.Storage = Storage
 	err := wHandlers.Storage.Init("localhost", "wmsdb", "devuser", "devuser")
+	
 	if err != nil {
 		l.Error.Fatalf("storage initialization failed, %v", err)
 	}
@@ -70,7 +71,7 @@ func main() {
 func StartHttpServer(router *mux.Router) {
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", "127.0.0.1", 7777),
+		Addr:    fmt.Sprintf("%s:%d", "127.0.0.1", 7123),
 		Handler: router,
 	}
 

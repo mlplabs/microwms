@@ -6,7 +6,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/mikelpsv/mod_logging v0.0.0-20210728092205-5989df9bb75e
 	github.com/mikelpsv/mod_micro_app v0.0.0-20210528061903-2ecb8387973c
-	github.com/mlplabs/microwms-core v0.0.0-20220719144146-7c355bcb4e29
+	github.com/mlplabs/microwms-core v0.0.0-20220725083530-8c4cbfc61d27
 )
 
 require (

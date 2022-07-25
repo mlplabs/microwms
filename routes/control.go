@@ -2,7 +2,6 @@ package routes
 
 import (
 	"fmt"
-	l "github.com/mikelpsv/mod_logging"
 	app "github.com/mikelpsv/mod_micro_app"
 	"net/http"
 )
@@ -46,13 +45,13 @@ func Ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetHealth(w http.ResponseWriter, r *http.Request) {
-	pingErr := app.Db.Ping()
-	if pingErr != nil {
-		l.Error.Printf("get health returned db error, %v", pingErr)
-	}
-	app.ResponseJSON(w, http.StatusOK, HealthResponse{
-		Database: pingErr == nil,
-	})
+	w.WriteHeader(http.StatusNotImplemented)
+	return
+	/*
+		app.ResponseJSON(w, http.StatusOK, HealthResponse{
+			Database: falses,
+		})
+	*/
 }
 
 func Custom404(w http.ResponseWriter, r *http.Request) {

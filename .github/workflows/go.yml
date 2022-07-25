@@ -20,6 +20,8 @@ jobs:
       run: go test -v ./...
 
   deploy:
+    needs: [build]
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,6 +29,6 @@ jobs:
         run: |
           set -eu
           mkdir "$HOME/.ssh"
-          echo "$" > "$HOME/.ssh/key"
-          chmod 600 "$HOME/.ssh/key"
+          echo "$" > "$HOME/.ssh/DEPLOY_KEY_FOR_VDS"
+          chmod 600 "$HOME/.ssh/DEPLOY_KEY_FOR_VDS"
           rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . mike@194.87.235.12:/home/deploy_mwms

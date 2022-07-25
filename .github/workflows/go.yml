@@ -20,6 +20,8 @@ jobs:
       run: go test -v ./...
 
   deploy:
+    env:
+      SSH_KEY: ${{secrets.DEPLOY_KEY_FOR_VDS}}
     needs: [build]
 
     runs-on: ubuntu-latest
@@ -29,6 +31,6 @@ jobs:
         run: |
           set -eu
           mkdir "$HOME/.ssh"
-          echo ${{ secrets.DEPLOY_KEY_FOR_VDS }} > "$HOME/.ssh/key"
+          echo "${{ env.SSH_KEY }}" > "$HOME/.ssh/key"
           chmod 600 "$HOME/.ssh/key"
           rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . mike@194.87.235.12:/home/deploy_mwms

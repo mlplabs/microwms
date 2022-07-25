@@ -35,13 +35,14 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - name: Store artifact
+      - uses: actions/checkout@v3
+
+      - name: Upload artifact
         uses: actions/download-artifact@v3
         with:
           name: build_data
           path: build/
 
-      - uses: actions/checkout@v3
       - name: Prepare key
         run: |
           set -eu

@@ -22,6 +22,12 @@ jobs:
     - name: Build
       run: mkdir builds && go build -o builds/mwms
 
+    - name: Store artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build_data
+        path: build/
+
   deploy:
     env:
       SSH_KEY: ${{secrets.DEPLOY_KEY_FOR_VDS}}
@@ -29,6 +35,12 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+      - name: Store artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build_data
+          path: build/
+
       - uses: actions/checkout@v3
       - name: Prepare key
         run: |

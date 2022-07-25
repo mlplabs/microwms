@@ -259,7 +259,7 @@ func (wh *WrapHttpHandlers) CreateProduct(w http.ResponseWriter, r *http.Request
 			fmt.Println(err)
 		}
 
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error, %d"))
+		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 		return
 	}
 
@@ -290,7 +290,7 @@ func (wh *WrapHttpHandlers) UpdateProduct(w http.ResponseWriter, r *http.Request
 			fmt.Println(e)
 		}
 
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error, %d"))
+		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 		return
 	}
 
@@ -321,7 +321,7 @@ func (wh *WrapHttpHandlers) CreateManufacturer(w http.ResponseWriter, r *http.Re
 			fmt.Println(err)
 		}
 
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error, %d"))
+		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 		return
 	}
 
@@ -352,7 +352,7 @@ func (wh *WrapHttpHandlers) UpdateManufacturer(w http.ResponseWriter, r *http.Re
 			fmt.Println(err)
 		}
 
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error, %d"))
+		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 		return
 	}
 

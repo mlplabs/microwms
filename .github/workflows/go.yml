@@ -33,6 +33,8 @@ jobs:
 
     env:
       SSH_KEY: ${{secrets.DEPLOY_KEY_FOR_VDS}}
+      HOSTNAME: ${{secrets.HOSTNAME}}
+
     needs: [build]
 
     runs-on: ubuntu-latest
@@ -49,7 +51,7 @@ jobs:
         run: |
           set -eu
           mkdir "$HOME/.ssh"
-          echo "$SSH_KEY" > "$HOME/.ssh/key"
+          echo "${{env.SSH_KEY}}" > "$HOME/.ssh/key"
           chmod 600 "$HOME/.ssh/key"
-          rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . $HOSTNAME:/home/mike/deploy_mwms
-          ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no $HOSTNAME chmod +x deploy_mwms/build/mwms
+          rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . $${{HOSTNAME}}:/home/mike/deploy_mwms
+          ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no ${{HOSTNAME}} chmod +x deploy_mwms/build/mwms

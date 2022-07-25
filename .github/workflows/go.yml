@@ -20,7 +20,7 @@ jobs:
 #   run: go test -v ./...
 
     - name: Build
-      run: mkdir builds && go build -o build/mwms
+      run: mkdir builds && GOOS=linux GOARCH=amd64 go build -race -ldflags "-extldflags '-static'" -o build/mwms
 
     - name: Store artifact
       uses: actions/upload-artifact@v3

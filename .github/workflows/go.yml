@@ -21,10 +21,10 @@ jobs:
       run: go test -v ./...
       
       
-      # Setup key
-    - name: Deploy
-    - run: set -eu
-    - run: mkdir "$HOME/.ssh"
-    - run: echo "$" > "$HOME/.ssh/key"
-    - run: chmod 600 "$HOME/.ssh/key"
-    - run: cd app && rsync -e "ssh -p 20022 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . mike@194.87.235.12:/home/deploy_mwms
+#      # Setup key
+#    - name: Deploy
+#    - run: set -eu
+#    - run: mkdir "$HOME/.ssh"
+#    - run: echo "$" > "$HOME/.ssh/key"
+#    - run: chmod 600 "$HOME/.ssh/key"
+#    - run: cd app && rsync -e "ssh -p 20022 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . mike@194.87.235.12:/home/deploy_mwms

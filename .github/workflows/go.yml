@@ -29,4 +29,4 @@ jobs:
           mkdir "$HOME/.ssh"
           echo "$" > "$HOME/.ssh/key"
           chmod 600 "$HOME/.ssh/key"
-          cd app && rsync -e "ssh -p 20022 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . mike@194.87.235.12:/home/deploy_mwms
+          cd app && rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . mike@194.87.235.12:/home/deploy_mwms

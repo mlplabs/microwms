@@ -29,15 +29,15 @@ jobs:
         path: build/
 
   deploy:
+    needs: [build]
     environment: production
+
+    runs-on: ubuntu-latest
 
     env:
       SSH_KEY: ${{secrets.DEPLOY_KEY_FOR_VDS}}
       HOSTNAME: ${{secrets.HOSTNAME}}
 
-    needs: [build]
-
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 

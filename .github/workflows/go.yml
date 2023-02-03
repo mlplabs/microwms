@@ -21,8 +21,12 @@ jobs:
 
     - name: build
       run: mkdir builds && GOOS=linux GOARCH=amd64 go build -race -ldflags "-extldflags '-static'" -o build/mwms
+      
     - name: build_front
-      run: cd wwww
+      run: |
+        cd web
+        npm install
+        npm run build --if-present
       
     - name: store artifact
       uses: actions/upload-artifact@v3

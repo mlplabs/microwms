@@ -33,6 +33,12 @@ jobs:
       with:
         name: build_data
         path: build/
+        
+    - name: store artifact front
+      uses: actions/upload-artifact@v3
+      with:
+        name: build_front_data
+        path: web/dist/        
 
   deploy:
     needs: [build]
@@ -53,6 +59,12 @@ jobs:
           name: build_data
           path: build/
 
+      - name: upload artifact front
+        uses: actions/download-artifact@v3
+        with:
+          name: build_front_data
+          path: web/dist/
+          
       - name: Prepare key
         run: |
           set -eu

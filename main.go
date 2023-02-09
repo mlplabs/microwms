@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
-	l "github.com/mikelpsv/mod_logging"
-	app "github.com/mikelpsv/mod_micro_app"
+	app "github.com/mlplabs/app-utils"
 	"github.com/mlplabs/microwms-core"
 	"github.com/mlplabs/microwms-core/models"
 	"github.com/mlplabs/microwms/routes"
@@ -19,22 +18,22 @@ import (
 var Storage *models.Storage
 
 func main() {
-	l.Init("", "")
-
+	app.Log.Init("", "")
 	Storage = microwms_core.GetStorage()
 
 	wHandlers := new(routes.WrapHttpHandlers)
 	wHandlers.Storage = Storage
 	err := wHandlers.Storage.Init("localhost", "wmsdb", "devuser", "devuser")
-	
+
 	if err != nil {
-		l.Error.Fatalf("storage initialization failed, %v", err)
+		app.Log.Error.Fatalf("storage initialization failed, %v", err)
 	}
 
 	routeItems := app.Routes{}
 	routeItems = RegisterHandlers(routeItems, wHandlers)
 	router := NewRouter(routeItems)
 	router.NotFoundHandler = http.HandlerFunc(routes.Custom404)
+	router.Use(mux.CORSMethodMiddleware(router))
 	StartHttpServer(router)
 
 	/*
@@ -77,7 +76,7 @@ func StartHttpServer(router *mux.Router) {
 
 	go func() {
 		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			l.Error.Fatal(err)
+			app.Log.Error.Fatal(err)
 		}
 	}()
 
@@ -89,35 +88,41 @@ func StartHttpServer(router *mux.Router) {
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
-		l.Error.Fatalf("server shutdown failed:%+v", err)
+		app.Log.Error.Fatalf("server shutdown failed:%+v", err)
 	}
 	if err := Storage.Db.Close(); err != nil {
-		l.Error.Fatalf("database close failed:%+v", err)
+		app.Log.Error.Fatalf("database close failed:%+v", err)
 	}
 
-	l.Info.Printf("Stopped Api server on %d port", 777)
+	app.Log.Info.Printf("Stopped Api server on %d port", 777)
 }
 func RegisterHandlers(routeItems app.Routes, wHandlers *routes.WrapHttpHandlers) app.Routes {
 	routeItems = routes.RegisterControlHandlers(routeItems)
 	routeItems = routes.RegisterProductsHandlers(routeItems, wHandlers)
+	routeItems = routes.RegisterWhsHandlers(routeItems, wHandlers)
+	routeItems = routes.RegisterManufacturersHandlers(routeItems, wHandlers)
+	routeItems = routes.RegisterHardwareHandlers(routeItems, wHandlers)
+	routeItems = routes.RegisterUsersHandlers(routeItems, wHandlers)
+
 	return routeItems
 }
 
 func NewRouter(routeItems app.Routes) *mux.Router {
 
 	router := mux.NewRouter().StrictSlash(true)
+
 	for _, route := range routeItems {
 		handlerFunc := route.HandlerFunc
-		if route.ValidateToken {
-			handlerFunc = app.SetMiddlewareAuth(handlerFunc)
-		}
+		//if route.ValidateToken {
+		//	handlerFunc = app.SetMiddlewareAuth(handlerFunc)
+		//}
 
 		if route.SetHeaderJSON {
 			handlerFunc = app.SetMiddlewareJSON(handlerFunc)
 		}
 
 		router.
-			Methods(route.Method).
+			Methods(route.Method, "OPTIONS").
 			Path(route.Pattern).
 			Name(route.Name).
 			HandlerFunc(handlerFunc)

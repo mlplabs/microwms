@@ -12,86 +12,62 @@ import (
 	"strconv"
 )
 
-type GetProductsResponse struct {
+type GetWhsResponse struct {
 	Header struct {
 		Limit  int `json:"limit"`
 		Offset int `json:"offset"`
 		Count  int `json:"count"`
 	} `json:"header"`
-	Data []models.Product `json:"data"`
+	Data []models.Whs `json:"data"`
 }
 
-func RegisterProductsHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) app.Routes {
-	routeItems = append(routeItems, app.Route{
-		Name:          "GetProducts",
-		Method:        "GET",
-		Pattern:       "/products",
-		SetHeaderJSON: true,
-		ValidateToken: false,
-		HandlerFunc:   wHandlers.GetProducts,
-	})
-	routeItems = append(routeItems, app.Route{
-		Name:          "GetProduct",
-		Method:        "GET",
-		Pattern:       "/products/{id}",
-		SetHeaderJSON: true,
-		ValidateToken: false,
-		HandlerFunc:   wHandlers.GetProductById,
-	})
-	routeItems = append(routeItems, app.Route{
-		Name:          "GetProductByBarcode",
-		Method:        "GET",
-		Pattern:       "/products/barcode/{barcode}",
-		SetHeaderJSON: true,
-		ValidateToken: false,
-		HandlerFunc:   wHandlers.GetProductsByBarcode,
-	})
-	routeItems = append(routeItems, app.Route{
-		Name:          "CreateProduct",
-		Method:        "POST",
-		Pattern:       "/products",
-		SetHeaderJSON: true,
-		ValidateToken: false,
-		HandlerFunc:   wHandlers.CreateProduct,
-	})
-	routeItems = append(routeItems, app.Route{
-		Name:          "UpdateProduct",
-		Method:        "PUT",
-		Pattern:       "/products/{id}",
-		SetHeaderJSON: true,
-		ValidateToken: false,
-		HandlerFunc:   wHandlers.UpdateProduct,
-	})
-	routeItems = append(routeItems, app.Route{
-		Name:          "DeleteProduct",
-		Method:        "DELETE",
-		Pattern:       "/products/{id}",
-		SetHeaderJSON: true,
-		ValidateToken: false,
-		HandlerFunc:   wHandlers.DeleteProduct,
-	})
+func RegisterWhsHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) app.Routes {
 
 	routeItems = append(routeItems, app.Route{
-		Name:          "GetZonesOfWarehouse",
+		Name:          "GetWarehouses",
 		Method:        "GET",
-		Pattern:       "/warehouses/{whs_id}/zones/",
+		Pattern:       "/warehouses",
 		SetHeaderJSON: true,
 		ValidateToken: false,
-		HandlerFunc:   wHandlers.GetZonesOfWarehouse,
+		HandlerFunc:   wHandlers.GetWarehouses,
 	})
 	routeItems = append(routeItems, app.Route{
-		Name:          "GetSuggestionProducts",
+		Name:          "GetWarehouse",
 		Method:        "GET",
-		Pattern:       "/suggestion/products/{text}",
+		Pattern:       "/warehouses/{whs_id}",
 		SetHeaderJSON: true,
 		ValidateToken: false,
-		HandlerFunc:   wHandlers.GetSuggestionProducts,
+		HandlerFunc:   wHandlers.GetWarehouse,
+	})
+	routeItems = append(routeItems, app.Route{
+		Name:          "CreateWhs",
+		Method:        "POST",
+		Pattern:       "/warehouses",
+		SetHeaderJSON: true,
+		ValidateToken: false,
+		HandlerFunc:   wHandlers.CreateWhs,
+	})
+	routeItems = append(routeItems, app.Route{
+		Name:          "UpdateWhs",
+		Method:        "PUT",
+		Pattern:       "/warehouses/{id}",
+		SetHeaderJSON: true,
+		ValidateToken: false,
+		HandlerFunc:   wHandlers.UpdateWhs,
+	})
+	routeItems = append(routeItems, app.Route{
+		Name:          "DeleteWhs",
+		Method:        "DELETE",
+		Pattern:       "/warehouses/{id}",
+		SetHeaderJSON: true,
+		ValidateToken: false,
+		HandlerFunc:   wHandlers.DeleteWhs,
 	})
 
 	return routeItems
 }
 
-func (wh *WrapHttpHandlers) GetProducts(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) GetWarehouses(w http.ResponseWriter, r *http.Request) {
 	varOffset := r.URL.Query().Get("o")
 	varLimit := r.URL.Query().Get("l")
 
@@ -104,62 +80,25 @@ func (wh *WrapHttpHandlers) GetProducts(w http.ResponseWriter, r *http.Request) 
 		limit = 0
 	}
 
-	ref := wh.Storage.GetRefProducts()
-	products, count, err := ref.GetItems(offset, limit, 0)
+	ref := wh.Storage.GetRefWarehouses()
+	mnfs, count, err := ref.GetItems(offset, limit, 0)
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 	}
 
-	response := GetProductsResponse{}
-	response.Data = make([]models.Product, 0)
+	response := GetWhsResponse{}
+	response.Data = make([]models.Whs, 0)
 
 	response.Header.Limit = limit
 	response.Header.Offset = offset
 	response.Header.Count = count
-	response.Data = products
+	response.Data = mnfs
 
 	app.ResponseJSON(w, http.StatusOK, response)
 }
 
-func (wh *WrapHttpHandlers) GetProductsByBarcode(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	val := vars["barcode"]
-
-	ref := wh.Storage.GetRefProducts()
-	prod, err := ref.FindByBarcode(val)
-	if err != nil {
-		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
-		return
-	}
-	app.ResponseJSON(w, http.StatusOK, prod)
-}
-
-func (wh *WrapHttpHandlers) GetProductById(w http.ResponseWriter, r *http.Request) {
-	var err error
-	var prod *models.Product
-	vars := mux.Vars(r)
-
-	if v, ok := vars["id"]; !ok || v == "0" {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
-		return
-	}
-
-	ref := wh.Storage.GetRefProducts()
-	valId, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
-		return
-	}
-	prod, err = ref.FindById(int64(valId))
-	if err != nil {
-		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
-		return
-	}
-	app.ResponseJSON(w, http.StatusOK, prod)
-}
-
-func (wh *WrapHttpHandlers) GetZonesOfWarehouse(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) GetWarehouse(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	if _, ok := vars["whs_id"]; !ok {
@@ -174,23 +113,18 @@ func (wh *WrapHttpHandlers) GetZonesOfWarehouse(w http.ResponseWriter, r *http.R
 	}
 
 	refWhs := wh.Storage.GetRefWarehouses()
-	whs, err := refWhs.FindById(int64(valId))
+	//whss, err := refWhs.FindById(int64(valId))
+	whss, err := refWhs.GetById(int64(valId))
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 		return
 	}
 
-	whss, err := refWhs.GetZones(whs)
-	if err != nil {
-		app.Log.Warning.Printf("data fetch error, %v", err)
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
-		return
-	}
 	app.ResponseJSON(w, http.StatusOK, whss)
 }
 
-func (wh *WrapHttpHandlers) CreateProduct(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) CreateWhs(w http.ResponseWriter, r *http.Request) {
 	// читаем данные
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
@@ -198,14 +132,14 @@ func (wh *WrapHttpHandlers) CreateProduct(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	data := new(models.Product)
+	data := new(models.Whs)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
 		return
 	}
 
-	ref := wh.Storage.GetRefProducts()
+	ref := wh.Storage.GetRefWarehouses()
 	whss, err := ref.Create(data)
 	if err != nil {
 		if err, ok := err.(*core.WrapError); !ok {
@@ -221,21 +155,21 @@ func (wh *WrapHttpHandlers) CreateProduct(w http.ResponseWriter, r *http.Request
 	app.ResponseJSON(w, http.StatusOK, whss)
 }
 
-func (wh *WrapHttpHandlers) UpdateProduct(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) UpdateWhs(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	if v, ok := vars["id"]; !ok || v == "0" {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
 		return
 	}
-	ref := wh.Storage.GetRefProducts()
+	ref := wh.Storage.GetRefWarehouses()
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
 
-	p, err := ref.FindById(int64(valId))
+	m, err := ref.FindById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
@@ -248,14 +182,14 @@ func (wh *WrapHttpHandlers) UpdateProduct(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	data := new(models.Product)
+	data := new(models.Whs)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
 		return
 	}
 
-	data.Id = p.Id
+	data.Id = m.Id
 
 	resultData, err := ref.Update(data)
 	if err != nil {
@@ -271,7 +205,7 @@ func (wh *WrapHttpHandlers) UpdateProduct(w http.ResponseWriter, r *http.Request
 	app.ResponseJSON(w, http.StatusOK, resultData)
 }
 
-func (wh *WrapHttpHandlers) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) DeleteWhs(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	if v, ok := vars["id"]; !ok || v == "0" {
@@ -279,40 +213,22 @@ func (wh *WrapHttpHandlers) DeleteProduct(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	ref := wh.Storage.GetRefProducts()
+	ref := wh.Storage.GetRefWarehouses()
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
 
-	p, err := ref.FindById(int64(valId))
+	m, err := ref.FindById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
 	}
-	resultData, err := ref.Delete(p)
+	resultData, err := ref.Delete(m)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusInternalServerError, fmt.Errorf("item deleting error"))
 		return
 	}
 	app.ResponseJSON(w, http.StatusOK, resultData)
-}
-
-func (wh *WrapHttpHandlers) GetSuggestionProducts(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	if _, ok := vars["text"]; !ok {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
-		return
-	}
-
-	ref := wh.Storage.GetRefProducts()
-	data, err := ref.GetSuggestion(vars["text"], 10)
-	if err != nil {
-		app.Log.Warning.Printf("data fetch error, %v", err)
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
-		return
-	}
-
-	app.ResponseJSON(w, http.StatusOK, data)
 }

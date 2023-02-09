@@ -1,16 +1,13 @@
 <template>
 <div>
-
   <div class="btn-toolbar mb-2 mb-md-0 justify-content-between" style="padding-top:5px; padding-bottom: 1px;">
     <div class="btn-group me-2">
       <button type="button" class="btn btn-sm btn-outline-secondary" @click="$emit('new-item-clicked') ">
-        <i class="bi bi-plus text-primary"></i>
+        <i class="bi bi-plus"></i>
       </button>
     </div>
     <div class="input-group">
-      <input type="text" class="form-control" placeholder="поиск"
-             v-show="isShowSearch"
-      >
+      <input type="text" class="form-control" placeholder="поиск" v-show="isShowSearch">
     </div>
   </div>
   <div class="table-responsive" style="overflow-x: initial;">
@@ -45,7 +42,7 @@
 
               <autocomplete-input v-else
                 v-model:propSelection=row[col.field]
-                v-model:propSuggestions="barcodesSuggestion">
+                v-model:propSuggestions="suggestion">
               </autocomplete-input>
 
             </template>
@@ -115,7 +112,7 @@ export default {
       currentPage: 1,
       countRows: 30,
       limitRows: 5,
-      barcodesSuggestion: []
+      suggestion: []
     }
   },
   methods:{
@@ -138,11 +135,11 @@ export default {
         });
         return key;
       }),
-      // 當前頁數 (current page number)
+      // current page number
       page: props.page,
-      // 每頁顯示筆數 (Display count per page)
+      // Display count per page
       //pageSize: defaultPageSize.value,
-      // 最大頁數 (Maximum number of pages)
+      // Maximum number of pages
       maxPage: computed(() => {
         if (props.total <= 0) {
           return 0;
@@ -154,16 +151,16 @@ export default {
         }
         return maxPage;
       }),
-      // 該頁數起始值 (The starting value of the page number)
+      // The starting value of the page number
       offset: computed(() => {
         return (setting.page - 1) * setting.pageSize + 1;
       }),
-      // 該頁數最大值 (Maximum number of pages0
+      // Maximum number of pages
       limit: computed(() => {
         let limit = setting.page * setting.pageSize;
         return props.total >= limit ? limit : props.total;
       }),
-      // 換頁陣列 (Paging array)
+      // Paging array
       paging: computed(() => {
         let startPage = setting.page - 2 <= 0 ? 1 : setting.page - 2;
         if (setting.maxPage - setting.page <= 2) {

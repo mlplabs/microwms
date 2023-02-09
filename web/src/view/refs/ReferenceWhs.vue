@@ -20,11 +20,45 @@
                   @onUpdateData="updateManufacturersData">
                 </autocomplete-input>
               </div>
+              <div class="mb-3">
+                <label for="inputAddr" class="form-label">Адрес</label>
+                <input id="inputAddr" class="form-control" type="text" v-model="detailItem.address"/>
+              </div>
+              <div class="mb-3">
+              </div>
+              <div class="mb-3">
+              </div>
+
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-accept" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Приемка</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-storage" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Хранение</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-ship" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Отгрузка</button>
+                </li>
+              </ul>
+              <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active pt-2" id="home-tab-accept" role="tabpanel" aria-labelledby="" tabindex="0">
+                    <label for="inputZoneIn" class="form-label">Зона приемки</label>
+                    <input id="inputZoneIn" class="form-control" disabled type="text" v-model="detailItem.acceptance_zone.name"/>
+                </div>
+                <div class="tab-pane fade pt-2" id="profile-tab-storage" role="tabpanel" aria-labelledby="" tabindex="0">
+                  <label for="inputZoneOut" class="form-label">Зона хранения</label>
+                  <input id="inputZoneOut" class="form-control" disabled type="text" />
+                </div>
+                <div class="tab-pane fade pt-2" id="contact-tab-ship" role="tabpanel" aria-labelledby="" tabindex="0">
+                  <label for="inputZoneStore" class="form-label">Зона отгрузки</label>
+                  <input id="inputZoneStore" class="form-control" disabled type="text" v-model="detailItem.shipping_zone.name" /> <!-- v-model="detailItem.storage_zones[0].name" -->
+                </div>
+              </div>
             </form>
 
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="closeDetailForm">{{ lng.btn_form_close }}</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="closeDetailForm">{{lng.btn_form_close}}</button>
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="storeItem">{{ lng.btn_form_store }}</button>
           </div>
         </div>
@@ -56,7 +90,7 @@
       <tbody>
       <tr v-for="(item, index) in tableData" :key="index">
         <td class="col_id">{{ item.id }}</td>
-        <td><a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.name }}</a></td>
+        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.name }}</a></td>
         <td class="col_action">
           <div class="dropdown">
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
@@ -82,12 +116,12 @@ import PaginationBar from "@/components/PaginationBar";
 import AutocompleteInput from "@/components/AutocompleteInput";
 
 export default {
-  name: "ReferenceManufacturers",
+  name: "ReferenceWhs",
   components: {AutocompleteInput, PaginationBar},
 
   data(){
     return {
-      refName: 'manufacturers',
+      refName: 'warehouses',
       tableData: [],
       countRows: 0,
       limitRows: 7,
@@ -95,6 +129,21 @@ export default {
       detailItem: {
         id: 0,
         name: "",
+        address: "",
+        acceptance_zone: {
+          id: 0,
+          name: "",
+        },
+        shipping_zone: {
+          id: 0,
+          name: "",
+        },
+        storage_zones: [
+          {
+            id: 0,
+            name: "",
+          }
+        ],
       },
       manufacturersSuggestion: [],
       columns: [
@@ -115,10 +164,10 @@ export default {
         }
       ],
       lng: {
-        title: "Производители",
-        title_form_create: "Создание производителя",
-        title_form_edit: "Редактирование производителя",
-        btn_list_create: "Новый производитель",
+        title: "Склады",
+        title_form_create: "Создание склада",
+        title_form_edit: "Редактирование склада",
+        btn_list_create: "Новый склад",
         btn_form_close: "Закрыть",
         btn_form_store: "Сохранить",
       },
@@ -139,7 +188,12 @@ export default {
 
     resetDetailItem(){
       this.detailItem.id = 0
-      this.detailItem.name = ''
+      this.detailItem.name = ""
+      this.detailItem.address = ""
+      this.detailItem.acceptance_zone = {id: 0, name: ""}
+      this.detailItem.shipping_zone =  {id: 0, name: ""}
+      this.detailItem.storage_zones = [ {id: 0, name: ""} ]
+
     },
 
     onSelectPage(eventData){

@@ -12,70 +12,70 @@ import (
 	"strconv"
 )
 
-type GetManufacturersResponse struct {
+type GetUsersResponse struct {
 	Header struct {
 		Limit  int `json:"limit"`
 		Offset int `json:"offset"`
 		Count  int `json:"count"`
 	} `json:"header"`
-	Data []models.Manufacturer `json:"data"`
+	Data []models.User `json:"data"`
 }
 
-func RegisterManufacturersHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) app.Routes {
+func RegisterUsersHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) app.Routes {
 
 	routeItems = append(routeItems, app.Route{
-		Name:          "GetManufacturers",
+		Name:          "GetUsers",
 		Method:        "GET",
-		Pattern:       "/manufacturers",
+		Pattern:       "/users",
 		SetHeaderJSON: true,
 		ValidateToken: false,
-		HandlerFunc:   wHandlers.GetManufacturers,
+		HandlerFunc:   wHandlers.GetUsers,
 	})
 	routeItems = append(routeItems, app.Route{
-		Name:          "GetManufacturer",
+		Name:          "GetUser",
 		Method:        "GET",
-		Pattern:       "/manufacturers/{id}",
+		Pattern:       "/users/{id}",
 		SetHeaderJSON: true,
 		ValidateToken: false,
-		HandlerFunc:   wHandlers.GetManufacturerById,
+		HandlerFunc:   wHandlers.GetUserById,
 	})
 	routeItems = append(routeItems, app.Route{
-		Name:          "CreateManufacturer",
+		Name:          "CreateUser",
 		Method:        "POST",
-		Pattern:       "/manufacturers",
+		Pattern:       "/users",
 		SetHeaderJSON: true,
 		ValidateToken: false,
-		HandlerFunc:   wHandlers.CreateManufacturer,
+		HandlerFunc:   wHandlers.CreateUser,
 	})
 	routeItems = append(routeItems, app.Route{
-		Name:          "UpdateManufacturer",
+		Name:          "UpdateUser",
 		Method:        "PUT",
-		Pattern:       "/manufacturers/{id}",
+		Pattern:       "/users/{id}",
 		SetHeaderJSON: true,
 		ValidateToken: false,
-		HandlerFunc:   wHandlers.UpdateManufacturer,
+		HandlerFunc:   wHandlers.UpdateUser,
 	})
 	routeItems = append(routeItems, app.Route{
-		Name:          "DeleteManufacturer",
+		Name:          "DeleteUser",
 		Method:        "DELETE",
-		Pattern:       "/manufacturers/{id}",
+		Pattern:       "/users/{id}",
 		SetHeaderJSON: true,
 		ValidateToken: false,
-		HandlerFunc:   wHandlers.DeleteManufacturer,
+		HandlerFunc:   wHandlers.DeleteUser,
 	})
 	routeItems = append(routeItems, app.Route{
-		Name:          "GetSuggestionProducts",
+		Name:          "GetSuggestionUsers",
 		Method:        "GET",
-		Pattern:       "/suggestion/manufacturers/{text}",
+		Pattern:       "/suggestion/users/{text}",
 		SetHeaderJSON: true,
 		ValidateToken: false,
-		HandlerFunc:   wHandlers.GetSuggestionManufacturers,
+		HandlerFunc:   wHandlers.GetSuggestionUsers,
 	})
 
 	return routeItems
 }
 
-func (wh *WrapHttpHandlers) CreateManufacturer(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 	// читаем данные
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
@@ -83,15 +83,15 @@ func (wh *WrapHttpHandlers) CreateManufacturer(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	data := new(models.Manufacturer)
+	data := new(models.User)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
 		return
 	}
 
-	ref := wh.Storage.GetRefManufacturers()
-	mnf, err := ref.Create(data)
+	ref := wh.Storage.GetRefUsers()
+	whss, err := ref.Create(data)
 	if err != nil {
 		if err, ok := err.(*core.WrapError); !ok {
 			fmt.Println(err)
@@ -103,12 +103,12 @@ func (wh *WrapHttpHandlers) CreateManufacturer(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	app.ResponseJSON(w, http.StatusOK, mnf)
+	app.ResponseJSON(w, http.StatusOK, whss)
 }
 
-func (wh *WrapHttpHandlers) GetManufacturerById(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) GetUserById(w http.ResponseWriter, r *http.Request) {
 	var err error
-	var mnf *models.Manufacturer
+	var usr *models.User
 	vars := mux.Vars(r)
 
 	if v, ok := vars["id"]; !ok || v == "0" {
@@ -116,22 +116,23 @@ func (wh *WrapHttpHandlers) GetManufacturerById(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	ref := wh.Storage.GetRefManufacturers()
+	ref := wh.Storage.GetRefUsers()
 
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
-	mnf, err = ref.FindById(int64(valId))
+	usr, err = ref.FindById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
 	}
-	app.ResponseJSON(w, http.StatusOK, mnf)
+	app.ResponseJSON(w, http.StatusOK, usr)
 }
 
-func (wh *WrapHttpHandlers) GetManufacturers(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) GetUsers(w http.ResponseWriter, r *http.Request) {
+
 	varOffset := r.URL.Query().Get("o")
 	varLimit := r.URL.Query().Get("l")
 
@@ -144,32 +145,33 @@ func (wh *WrapHttpHandlers) GetManufacturers(w http.ResponseWriter, r *http.Requ
 		limit = 0
 	}
 
-	ref := wh.Storage.GetRefManufacturers()
-	mnfs, count, err := ref.GetItems(offset, limit, 0)
+	ref := wh.Storage.GetRefUsers()
+	usrs, count, err := ref.GetItems(offset, limit, 0)
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 	}
 
-	response := GetManufacturersResponse{}
-	response.Data = make([]models.Manufacturer, 0)
+	response := GetUsersResponse{}
+
+	response.Data = make([]models.User, 0)
 
 	response.Header.Limit = limit
 	response.Header.Offset = offset
 	response.Header.Count = count
-	response.Data = mnfs
+	response.Data = usrs
 
 	app.ResponseJSON(w, http.StatusOK, response)
 }
 
-func (wh *WrapHttpHandlers) UpdateManufacturer(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	if v, ok := vars["id"]; !ok || v == "0" {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
 		return
 	}
-	ref := wh.Storage.GetRefManufacturers()
+	ref := wh.Storage.GetRefUsers()
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
@@ -189,7 +191,7 @@ func (wh *WrapHttpHandlers) UpdateManufacturer(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	data := new(models.Manufacturer)
+	data := new(models.User)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
@@ -212,7 +214,7 @@ func (wh *WrapHttpHandlers) UpdateManufacturer(w http.ResponseWriter, r *http.Re
 	app.ResponseJSON(w, http.StatusOK, resultData)
 }
 
-func (wh *WrapHttpHandlers) DeleteManufacturer(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	if v, ok := vars["id"]; !ok || v == "0" {
@@ -220,7 +222,7 @@ func (wh *WrapHttpHandlers) DeleteManufacturer(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	ref := wh.Storage.GetRefManufacturers()
+	ref := wh.Storage.GetRefUsers()
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
@@ -240,14 +242,14 @@ func (wh *WrapHttpHandlers) DeleteManufacturer(w http.ResponseWriter, r *http.Re
 	app.ResponseJSON(w, http.StatusOK, resultData)
 }
 
-func (wh *WrapHttpHandlers) GetSuggestionManufacturers(w http.ResponseWriter, r *http.Request) {
+func (wh *WrapHttpHandlers) GetSuggestionUsers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	if _, ok := vars["text"]; !ok {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
 		return
 	}
 
-	ref := wh.Storage.GetRefManufacturers()
+	ref := wh.Storage.GetRefUsers()
 	data, err := ref.GetSuggestion(vars["text"], 10)
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)

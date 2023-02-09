@@ -4,7 +4,7 @@
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 v-if="detailItem.id === 0" class="modal-title">{{lng.title_form_create}}</h5>
+            <h5 v-if="detailItem.id === 0" class="modal-title">{{ lng.title_form_create }}</h5>
             <h5 v-else class="modal-title">{{lng.title_form_edit}}</h5>
 
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closeDetailForm"></button>
@@ -56,13 +56,14 @@
       <tbody>
       <tr v-for="(item, index) in tableData" :key="index">
         <td class="col_id">{{ item.id }}</td>
-        <td><a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.name }}</a></td>
+        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.name }}</a></td>
         <td class="col_action">
           <div class="dropdown">
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
               <i class="bi bi-three-dots-vertical"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" @click.prevent="printLabel(item.id)">Печать бейджа {{item.name}}</a></li>
               <li><a class="dropdown-item" href="#" @click.prevent="deleteItem(item.id)">Удалить {{item.name}}</a></li>
               <!--li><a class="dropdown-item" href="#">Another action {{item.id}}</a></li>
               <li><a class="dropdown-item" href="#">Something else here</a></li-->
@@ -82,12 +83,12 @@ import PaginationBar from "@/components/PaginationBar";
 import AutocompleteInput from "@/components/AutocompleteInput";
 
 export default {
-  name: "ReferenceManufacturers",
+  name: "ReferenceUsers",
   components: {AutocompleteInput, PaginationBar},
 
   data(){
     return {
-      refName: 'manufacturers',
+      refName: 'users',
       tableData: [],
       countRows: 0,
       limitRows: 7,
@@ -115,10 +116,10 @@ export default {
         }
       ],
       lng: {
-        title: "Производители",
-        title_form_create: "Создание производителя",
-        title_form_edit: "Редактирование производителя",
-        btn_list_create: "Новый производитель",
+        title: "Пользователи",
+        title_form_create: "Создание пользователя",
+        title_form_edit: "Редактирование пользователя",
+        btn_list_create: "Новый пользователь",
         btn_form_close: "Закрыть",
         btn_form_store: "Сохранить",
       },
@@ -184,6 +185,13 @@ export default {
             console.log('delete failed')
           }
           this.updateItemsOnPage(this.currentPage)
+        })
+        .catch(error => { this.errorProc(error) });
+    },
+    printLabel(id){
+      DataProvider.PrintItemReference(this.refName, id)
+        .then((response) => {
+          console.log(response)
         })
         .catch(error => { this.errorProc(error) });
     },

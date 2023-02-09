@@ -120,6 +120,7 @@ export default {
 </script>
 
 <style scoped>
+/*
 .dropdown-item a {
   text-decoration: none !important;
 }
@@ -128,4 +129,5 @@ export default {
 .dropdown-menu > .active > a:focus {
   color: #FFFFFF;
 }
+ */
 </style>

@@ -12,8 +12,9 @@ servers:
     
 tags:
 - name: "Общие методы"
-- name: "Справочники"
-- name: "Методы клиента"
+- name: "Товары"
+- name: "Производители"
+- name: "Штрих-коды"
 
 paths:
   /ping:
@@ -32,7 +33,7 @@ paths:
   /refs/products/:
     get:
       tags:
-        - "Справочники"
+        - "Товары"
       summary: получение списка товаров
       responses:
         200:
@@ -40,12 +41,10 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProductItem'   
+                $ref: '#/components/schemas/ProfuctsResponse'   
     post:
       tags: 
-        - "Справочники"
+        - "Товары"
       summary: создание нового товара
       requestBody:
         content:
@@ -58,12 +57,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResultItem'          
+                $ref: '#/components/schemas/ResultItem'  
 
   /refs/products/{product_id}/:
     get:
       tags:
-        - "Справочники"
+        - "Товары"
       summary: получение товара по идентификатору
       parameters:
         - name: product_id
@@ -83,11 +82,55 @@ paths:
                   $ref: '#/components/schemas/ProductItem'   
         404:
           description: товар не найден
+
+    put:
+      tags: 
+        - "Товары"
+      summary: изменение товара
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          description: идентификатор товара
+          schema:
+            type: integer        
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductItem"      
+      responses:
+        200:
+          description: OK   
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultItem'  
+    delete:
+      tags:
+        - "Товары"
+      summary: удаление товара
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          description: идентификатор товара
+          schema:
+            type: integer        
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfuctsResponse'                  
+        404:
+          description: товар не найден
           
   /refs/products/barcode/{barcode}/:
     get:
       tags:
-        - "Справочники"
+        - "Товары"
       summary: получение товаров по штрих-коду
       parameters:
         - name: barcode
@@ -111,7 +154,7 @@ paths:
   /refs/manufacturers:
     get:
       tags:
-        - "Справочники"
+        - "Производители"
       summary: получение списка производителей
       responses:
         200:
@@ -124,7 +167,7 @@ paths:
                   $ref: '#/components/schemas/ManufacturerItem'  
     post:
       tags:
-        - "Справочники"
+        - "Производители"
       summary: создание нового производителя
       requestBody:
         content:
@@ -138,11 +181,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResultItem'               
-
+  
+  /refs/manufacturers/{manufacturer_id}:
+    get:
+      tags:
+        - "Производители"
+      summary: получение производителя по идентификатору
+      parameters:
+        - name: manufacturer_id
+          in: path
+          required: true
+          description: идентификатор производителя
+          schema:
+            type: integer          
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ManufacturerItem'   
+        404:
+          description: товар не найден
     put:
       tags:
-        - "Справочники"
+        - "Производители"
       summary: изменение производителя
+      parameters:
+        - name: manufacturer_id
+          in: path
+          required: true
+          description: идентификатор производителя
+          schema:
+            type: integer  
       requestBody:
         content:
           application/json:
@@ -155,7 +228,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResultItem'               
-
+    delete:
+      tags:
+        - "Производители"
+      summary: удаление производителя
+      parameters:
+        - name: manufacturer_id
+          in: path
+          required: true
+          description: идентификатор производителя
+          schema:
+            type: integer        
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfuctsResponse'                  
+        404:
+          description: товар не найден
           
   /refs/warehouses:
     get:
@@ -171,6 +263,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WarehouseItem' 
+  
   /refs/warehouses/{whs_id}/:
     get:
       tags:
@@ -215,248 +308,6 @@ paths:
 
 
 
-
-  /v1.0/orders:
-    post:
-      tags:
-        - "Заказы"
-      summary: Получение заказов
-      description: 'Клиент отправляет Партнеру новые заказы с помощью POST запроса. В одном запросе может быть несколько заказов. В ответ Партнер должен вернуть информацию о загруженных и ошибочных заказах. Если заказ принят успешно, то дальнейшая его обработка осуществляется на стороне Партнера. Партнер периодически экспортирует данные о новом статусе заказа сервису Клиента. Если заказ отклонен, то дальнейшая его обработка производится Клиентов. Партнер не должен собирать и доставлять такой заказ. Состав принятого Партнером заказа не изменяется никем.'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Orders"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseOrder'
-  
-  /v1.0/order_cancel:
-    post:
-      tags:
-       - "Заказы"
-      summary: Отмена заказов
-      description: 'отмена заказа возможна только до отправки заказа на сборку'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: 'список уникальных идентификаторов заказов для отмены'
-              items:
-                type: string
-                example: 'f7942d72-1545-455b-93c7-b2d7d9dec3e5'
-      responses:
-        200:
-          description: OK              
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseOrderCancel'                
-  /client-endpoint/ping:
-    get:
-      tags:
-        - "Методы клиента"
-      summary: Проверкa активности сервиса. 
-      description: Клиентский сервис должен иметь метод проверки активности сервиса и отвечать статусом 200 при работоспособности. Требований к телу ответа не предъявляется.
-      responses:
-        200:
-          description: OK
-  /client-endpoint/goods:
-    get:
-      tags:
-        - "Методы клиента"
-      summary: Импорт справочника товаров 
-      description: Импорт справочника товаров служит Партнеру для связки идентификаторов товаров Клиента со своими идентификаторами
-      parameters:
-        - name: limit
-          in: query
-          required: true
-          description: Лимит кол-ва элементов в ответе
-          schema:
-            type: integer  
-        
-        - name: offset
-          in: query
-          required: true
-          description: Пропуск кол-ва элементов в ответе
-          schema:
-            type: integer            
-      
-      responses:
-        200:
-          description: OK        
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseImportGoods'          
-  /client-endpoint/manufacturers:
-    get:
-      tags:
-        - "Методы клиента"
-      summary: Импорт справочника производителей 
-      description: Импорт справочника производителей служит Партнеру для связки идентификаторов производителей Клиента со своими идентификаторами
-      
-      parameters:
-        - name: limit
-          in: query
-          required: true
-          description: Лимит кол-ва элементов в ответе
-          schema:
-            type: integer  
-        
-        - name: offset
-          in: query
-          required: true
-          description: Пропуск кол-ва элементов в ответе
-          schema:
-            type: integer            
-      
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseImportManufactures'
-  /client-endpoint/stores:
-    get:
-      tags:
-        - "Методы клиента"
-      summary: Импорт точек доставки  
-      description: Импорт точек доставки служит Партнеру для связки идентификаторов точек доставки Клиента со своими идентификаторами
-      parameters:
-        - name: limit
-          in: query
-          required: true
-          description: Лимит кол-ва элементов в ответе
-          schema:
-            type: integer  
-        
-        - name: offset
-          in: query
-          required: true
-          description: Пропуск кол-ва элементов в ответе
-          schema:
-            type: integer            
-      
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseImportStores'  
-  /client-endpoint/price_changes_async:
-    post:  
-      tags:
-      - "Методы клиента"
-      summary: Экспорт цен  (асинхронный метод) 
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/PriceItem'
-
-      responses:
-        200:
-          description: OK  
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseAsync'
-  /client-endpoint/stock_changes_async:
-    post:  
-      tags:
-      - "Методы клиента"
-      summary: Экспорт остатков (асинхронный метод)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/StockItem'
-
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseAsync'
-
-  /client-endpoint/tasks/{request_id}:
-    get:
-      tags:
-      - "Методы клиента"
-      summary: запрос состояния асинхронной операции 
-      parameters:
-        - name: request_id
-          in: path
-          required: true
-          description: Уникальный идентификатор асинхронной задачи
-          schema:
-            type: string
-      responses:
-        200:
-          description: OK          
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AsyncRequestState'
-
-
-
-
-  /client-endpoint/timetables:
-    post:  
-      tags:
-      - "Методы клиента"
-      summary: Экспорт расписаний доставки 
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/TimetablesItem'      
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseTimetables'          
-
-
-  /client-endpoint/order_status:
-    post:  
-      tags:
-      - "Методы клиента"
-      summary: Экспорт статусов заказов
-      description: 'Партнер, при смене сосотояния заказа, отпраляет на сервер Клиента текущий статус заказа'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/OrderStatusItem'      
-      
-      responses:
-        200:
-          description: OK 
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseOrderStatus'           
 
 
 
@@ -562,7 +413,29 @@ components:
               type: integer
             usefulVolume:
               type: integer 
-          
+    
+    PaggingHeader:
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: запрошенное количество записей
+        offset:
+          type: integer
+          description: смещение
+        count:
+          type: integer
+          description: общее количество записей по отбору
+    
+    ProfuctsResponse:
+      type: object
+      properties:
+        header: 
+          $ref: '#/components/schemas/PaggingHeader'
+        data:
+          type: array
+          items:
+              $ref: '#/components/schemas/ProductItem'
 
     ManufacturerItem:
       type: object
@@ -578,489 +451,6 @@ components:
           example: Производитель
 
 
-    Customer:
-      type: object
-      description: получатель заказа
-      properties:
-        full_name: 
-          type: string
-          example: Иванов Иван Иванович
-        mobile_phone:
-          type: string
-          example: +7(987)654-32-10
-        email:
-          type: string
-          example: mail@example.com          
-    OrderProductRow:
-      type: object
-      description: элемент списка товаров заказа
-      properties:
-        product_id:
-          type: string
-          example: '477e3490-f650-44fc-b3d5-be29bdfa8af4'
-        name:
-          type: string
-          example: 'Нурофен Экспресс капсулы 200 мг, 24 шт.'
-        price_b2c:
-          type: integer
-          example: '300'
-        quantity:
-          type: integer
-          example: '4'
-    Order:
-      type: object
-      properties:
-        id:
-          type: string
-          description: клиентский уникальный идентификатор заказа
-          example: 'f7942d72-1545-455b-93c7-b2d7d9dec3e5'
-        number:
-          type: string
-          description: клиентский номер заказа
-          example: 'K12345'
-        status:
-          type: integer
-          description: клиентский статус заказа (первичный)
-          example: '100'
-        customer:
-          $ref: '#/components/schemas/Customer'
-        date_time:
-          type: string
-          description: дата оформления заказа
-          example: '2020-05-11 12:34:56'
-        store_id:
-          type: string
-          description: уникальный идентификатор точки доставки
-          example: '32854fe8-6703-4a54-8c75-1add6ccc1891'
-        dedelivery_date:
-          type: string
-          description: запрашиваемая дата доставки
-          example: '2020-05-13 00:00:00'
-        positions:
-          type: array
-          items:
-              $ref: '#/components/schemas/OrderProductRow'
-    Orders:
-      description: список объектов входящих заказов
-      type: array
-      items:
-          $ref: '#/components/schemas/Order'
-    ResponseAcceptedItem:
-      type: string
-      example: '618035e6-dea7-49cc-99be-7563c9432de7'
-    ResponseOrder:
-      type: object
-      properties:
-        accepted:
-          type: array
-          items:
-            $ref: '#/components/schemas/ResponseAcceptedItem'
-
-        rejected:
-          type: array
-          items:
-            type: object
-            properties:
-              order_id:
-                type: string
-                example: '3d61a7c4-3d7a-470c-9e65-0228226e030c'
-              error:
-                type: string
-                example: 'Невозможно доставить заказ до выбранной даты'
-    ResponseBarcodeItem:
-      type: string
-      example: '461659846532'
-    ResponseImportGoodsItem:
-      type: object
-      properties:
-        id:
-          type: string
-          description: 'уникальный идентификатор товара'
-          example: '477e3490-f650-44fc-b3d5-be29bdfa8af4'
-        name:
-          type: string
-          description: 'наименование товара'
-          example: 'Нурофен Экспресс капсулы 200 мг, 24 шт.'         
-        manufacturer_id:
-          type: string
-          description: 'уникальный идентификатор производителя'
-          example: '63d76865-5de1-405c-8f90-1677e541f535'          
-        country:
-          type: integer
-          description: 'код страны ОКСМ'
-          example: '376'        
-        rx:
-          type: integer
-          description: 'признак рецептурного товара (0 или 1)'
-          example: '0'        
-        volume:
-          type: integer
-          description: 'обьем упаковки (см3)'
-          example: '0.154'
-        weight:
-          type: integer
-          description: 'вес упаковки (кг)'
-          example: '0.03'         
-        brand:
-          type: string
-          description: 'наименование бренда'
-          example: 'Нурофен'         
-        drug_form:
-          type: string
-          description: 'лекарственная форма'
-          example: 'капсулы'          
-        dosage:
-          type: string
-          description: 'дозировка'
-          example: '200 мг'         
-        packing:
-          type: string
-          description: 'доз в упаковке'
-          example: '24'         
-        barcodes:
-          type: array
-          description: 'список штрихкодов'
-          items:
-            $ref: '#/components/schemas/ResponseBarcodeItem'          
-    ResponseImportGoods:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: '1023'
-        next:
-          type: string
-          example: 'http://client-endpoint/goods?api_key=[КЛЮЧ_ДОСТУПА]&limit=100&offset=500'
-        previous:
-          type: string
-          example: 'http://client-endpoint/goods?api_key=[КЛЮЧ_ДОСТУПА]&limit=100&offset=300'
-        result:
-          type: array
-          description: список товаров
-          items:
-            $ref: '#/components/schemas/ResponseImportGoodsItem'
-    ResponseImportManufacturesItem:
-      type: object
-      properties:
-        id:
-          type: string
-          description: 'уникальный идентификатор производителя'
-          example: '63d76865-5de1-405c-8f90-1677e541f535'
-        name:
-          type: string
-          description: 'наименование производителя'
-          example: 'Рекитт Бенкизер'         
-    ResponseImportManufactures:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: '300'
-        next:
-          type: string
-          example: 'http://client-endpoint/manufacturers?api_key=[КЛЮЧ_ДОСТУПА]&limit=100&offset=500'
-        previous:
-          type: string
-          example: 'http://client-endpoint/manufacturers?api_key=[КЛЮЧ_ДОСТУПА]&limit=100&offset=300'
-        result:
-          type: array
-          description: список производителй
-          items:
-            $ref: '#/components/schemas/ResponseImportManufacturesItem'            
-    ResponseSchedulesItem:
-      type: object
-      properties:
-        day: 
-          type: integer
-          description: 'день недели от 1 до 7'
-          example: '1'
-        open_time: 
-          type: string
-          description: 'время начала работы'
-          example: '10:00'
-        close_time: 
-          type: string
-          description: 'время окончания работы'
-          example: '20:00'          
-    ResponseImportStoresItem:
-      type: object
-      properties:
-        id:
-          type: string
-          description: 'уникальный идентификатор точки доставки'
-          example: '3e494d3d-87bd-4e70-9fc3-b485d40e4a78'
-        inn:
-          type: string
-          description: 'ИНН'
-          example: '5047045359'          
-        name:
-          type: string
-          description: 'наименование точки доставки'
-          example: 'Здоровье 37 Трудолюбия 35' 
-        region:
-          type: integer
-          description: 'регион'
-          example: '77' 
-        address:
-          type: string
-          description: 'наименование точки доставки'
-          example: '141402, Москва, ул. Трудолюбия 37' 
-        fias:
-          type: string
-          description: ''
-          example: '39775f7b-e08c-41b6-833d-1d75d16eabaf' 
-        phone:
-          type: string
-          description: 'телефон'
-          example: '+7 (496) 771-11-08' 
-        email:
-          type: string
-          description: 'электронная почта'
-          example: 'mail@example.net' 
-        lat:
-          type: string
-          description: 'координаты широты'
-          example: '55.903223' 
-        lon:
-          type: string
-          description: 'координаты долготы'
-          example: '37.420857'                                 
-        schedules:
-          type: array
-          description: список расписаний
-          items:
-            $ref: '#/components/schemas/ResponseSchedulesItem' 
-    ResponseImportStores:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: '750'
-        next:
-          type: string
-          example: 'http://client-endpoint/stores?api_key=[КЛЮЧ_ДОСТУПА]&limit=100&offset=500'
-        previous:
-          type: string
-          example: 'http://client-endpoint/stores?api_key=[КЛЮЧ_ДОСТУПА]&limit=100&offset=300'
-        result:
-          type: array
-          description: список точек доставки
-          items:
-            $ref: '#/components/schemas/ResponseImportStoresItem'            
-    ResponseAsync:
-      type: object
-      properties:
-        request_id:
-          type: string
-          description: 'уникальный идентификатор запроса'
-          example: '40696926bcb13fa8a14c85d16dc2be57'
-
-    PriceItem:
-      type: object
-      properties:
-        product_id:
-          type: string
-          description: 'уникальный идентификатор товара клиента'
-          example: '477e3490-f650-44fc-b3d5-be29bdfa8af4'
-        price_b2c:
-          type: integer
-          description: 'цена для покупателя (с НДС)'
-          example: '100'
-        price_b2b:
-          type: integer
-          description: 'цена партнера (без НДС)'
-          example: '98'
-        vat_b2b:
-          type: integer
-          description: 'ставка НДС'
-          example: '20'
-        region:
-          type: integer
-          description: 'регион'
-          example: '77'          
-        expiration_date:
-          type: string
-          description: 'срок годности'
-          example: '2021-03-11'      
-    StockItem:
-      type: object
-      properties:
-        product_id:
-          type: string
-          description: 'уникальный идентификатор товара клиента'
-          example: '477e3490-f650-44fc-b3d5-be29bdfa8af4'
-        quantity:
-          type: integer
-          description: 'количество остаток'
-          example: '15'
-        region:
-          type: integer
-          description: 'регион'
-          example: '77'  
-    
-    AsyncRequestState:
-      type: object
-      properties:
-        status:
-          type: string
-          description: 'состояния асинхронных задач (processing/finished)'
-          example: 'finished'
-        result:
-          type: object
-          properties:
-            items:
-              type: array
-              description: результат завершения асинхронной операции. элемент обязателен для статуса finished
-              items:
-                type: object
-                properties:
-                  total: 
-                    type: integer
-                    description: 'получено всего элементов'
-                    example: 753
-                  updated: 
-                    type: integer
-                    description: 'обновлено элементов'
-                    example: 36
-                  added: 
-                    type: integer
-                    description: 'добавлено элементов'
-                    example: 716                
-                  error: 
-                    type: integer
-                    description: 'ошибок'
-                    example: 1                
-        errors:
-          type: array
-          items:
-            type: string
-            example: ''
-
-    
-    TimetablesItem:
-      type: object
-      properties:
-        store_id:
-          type: string
-          description: 'уникальный идентификатор точки доставки'
-          example: '2b21973e-a4ab-453e-958c-2174a5073fd8'
-        region:
-          type: integer
-          description: регион, к которому "подключена" точка доставки
-          example: 77
-        status:
-          type: integer
-          description: статус точки доставки. сейчас не используется. предполагается для переедачи доп информации о статусе работы точки (ЛТК, ПДЗ и т.п.) без отключения от сервиса
-        shedules:
-          type: array
-          description: 'количество остаток'
-          items:
-            type: object
-            properties:
-              stop_date: 
-                type: string
-                example: '2020-05-22 19:59:59'
-              delivery_date: 
-                type: string
-                example: '2020-05-24 18:00:00'
-
-    ResponseTimetables:
-      type: object
-      properties:
-        items:
-          type: object
-          properties:
-            total:
-              type: integer
-              description: 'получено всего элементов'
-              example: 650
-            updated:
-              type: integer
-              description: 'обновлено элементов'
-              example: 380              
-            added:
-              type: integer
-              description: 'добавлено элементов'
-              example: 120
-            error:
-              type: integer              
-              description: 'ошибок'
-              example: 1              
-        errors:
-          type: array
-          items:
-            type: string
-            example: 'Не найдена точка доставки с идентификатором: "7bf9f53e-3303-4a37-beb1-88bc9282c0b0"'
-
-    OrderStatusItem:
-      type: object
-      properties:
-        order_id:
-          type: string
-          description: 'Уникальный идентификатор заказа'
-          example: '618035e6-dea7-49cc-99be-7563c9432de7'
-        status:
-          type: integer
-          description: 'Текущий статус заказа'
-          example: '150'
-        products:
-          type: array
-          items:
-            type: object
-            properties:
-              product_id:
-                type: string
-                description: 'Уникальный идентификатор товара'
-                example: '477e3490-f650-44fc-b3d5-be29bdfa8af4'
-              quantity:
-                type: integer
-                description: 'Количестово к заказу'
-                example: '4'      
-              confirmed:
-                type: integer
-                description: 'Подтвержденное количество'
-                example: '4'       
-    
-    ResponseOrderStatus:
-      type: object
-      properties:
-        accepted:
-          type: array
-          items:
-            type: string
-            example: '618035e6-dea7-49cc-99be-7563c9432de7'
-        rejected:
-          type: array
-          items: 
-            type: object
-            properties:
-              order_id:
-                type: string
-                example: '619035e6-dea7-49cc-99be-7563c9432de7'
-              error:
-                type: string
-                example: 'Cтатус 400 уже был установлен ранее'    
-    
-      
-    ResponseOrderCancel:
-      type: object
-      properties:
-        accepted:
-          type: array
-          items:
-            type: string
-            example: '618035e6-dea7-49cc-99be-7563c9432de7'
-        rejected:
-          type: array
-          items: 
-            type: object
-            properties:
-              order_id:
-                type: string
-                example: '619035e6-dea7-49cc-99be-7563c9432de7'
-              error:
-                type: string
-                example: 'Отмена в данном статусе не возможна'
       
   securitySchemes:
       ApiKeyAuth:        

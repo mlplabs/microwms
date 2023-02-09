@@ -4,8 +4,8 @@
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 v-if="detailItem.id === 0" class="modal-title">Создание товара</h5>
-            <h5 v-else class="modal-title">Редактирование товара</h5>
+            <h5 v-if="detailItem.id === 0" class="modal-title">{{lng.title_form_create}}</h5>
+            <h5 v-else class="modal-title">{{ lng.title_form_edit }}</h5>
 
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closeDetailForm"></button>
           </div>
@@ -13,7 +13,7 @@
             <form>
               <input type="hidden" value="{{detailItem.id}}" >
               <div class="mb-3">
-                <label for="inputName" class="form-label text-muted">Наименование</label>
+                <label for="inputName" class="form-label">Наименование</label>
                 <autocomplete-input
                   v-model:prop-suggestions="productsSuggestion"
                   v-model:prop-selection="detailItem.name"
@@ -24,7 +24,7 @@
               </div>
               <div class="row mb-3">
                 <div class="col-md-8">
-                  <label for="inputMnf" class="form-label text-muted">Производитель</label>
+                  <label for="inputMnf" class="form-label">Производитель</label>
                   <autocomplete-input
                     v-model:prop-suggestions="manufacturersSuggestion"
                     v-model:prop-selection="detailItem.manufacturer.name"
@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="col-md-4">
-                  <label for="inputItemNumber" class="form-label text-muted">Артикул</label>
+                  <label for="inputItemNumber" class="form-label">Артикул</label>
                   <input type="text" class="form-control" id="inputItemNumber" v-model="detailItem.item_number">
                 </div>
               </div>
@@ -52,8 +52,8 @@
 
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="closeDetailForm">Закрыть</button>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="storeItem">Сохранить</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="closeDetailForm">{{ lng.btn_form_close }}</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="storeItem">{{ lng.btn_form_store }}</button>
           </div>
         </div>
       </div>
@@ -61,10 +61,12 @@
   </div>
 
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Товары</h1>
+    <h5>{{ lng.title }}</h5>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group me-2">
-        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailForm"  @click="showDetailForm(0) "><i class="bi bi-journal-plus text-primary" style="padding-right: 3px;"></i>Новый товар</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailForm"  @click="showDetailForm(0) ">
+          <i class="bi bi-plus"></i>
+        </button>
       </div>
 
       <!--div class="btn-group me-2">
@@ -81,7 +83,7 @@
   <h2></h2>
   <div class="table-responsive">
     <table class="table table-striped table-hover table-bordered">
-      <thead class="table-dark">
+      <thead> <!-- class="table-dark" -->
       <tr>
         <th scope="col" class="col_head col_id">#</th>
         <th scope="col" class="col_head">Наименование</th>
@@ -93,10 +95,22 @@
       <tbody>
       <tr v-for="(item, index) in tableData" :key="index">
         <td class="col_id">{{ item.id }}</td>
-        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.name }}</a></td>
+        <td><a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.name }}</a></td>
         <td>{{ item.item_number }}</td>
         <td>{{ item.manufacturer.name }}</td>
-        <td class="col_action"><button type="button" class="btn" @click="deleteItem(item.id)"><i class="bi bi-journal-x text-danger"></i></button> </td>
+        <td class="col_action">
+          <div class="dropdown">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" @click.prevent="printLabel(item.id)">Печать этикетки {{item.name}}</a></li>
+              <li><a class="dropdown-item" href="#" @click.prevent="deleteItem(item.id)">Удалить {{item.name}}</a></li>
+              <!--li><a class="dropdown-item" href="#">Another action {{item.id}}</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li-->
+            </ul>
+          </div>
+        </td>
       </tr>
       </tbody>
     </table>
@@ -164,6 +178,14 @@ export default {
       ],
       productsSuggestion: [],
       manufacturersSuggestion: [],
+      lng: {
+        title: "Товары",
+        title_form_create: "Создание товара",
+        title_form_edit: "Редактирование товара",
+        btn_list_create: "Новый товар",
+        btn_form_close: "Закрыть",
+        btn_form_store: "Сохранить",
+      },
     }
   },
 
@@ -225,6 +247,7 @@ export default {
     },
 
     storeItem(){
+
       DataProvider.StoreItemReference(this.refName, this.detailItem)
         .then((response) => {
           const storeId = response.data;
@@ -246,7 +269,13 @@ export default {
         })
         .catch(error => { this.errorProc(error) });
     },
-
+    printLabel(id){
+      DataProvider.PrintItemReference(this.refName, id)
+        .then((response) => {
+          console.log(response)
+        })
+        .catch(error => { this.errorProc(error) });
+    },
     updateProductsData(emitData){
       DataProvider.GetSuggestionReference(this.refName, emitData.val)
         .then((response) => {

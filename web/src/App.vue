@@ -3,8 +3,8 @@
   <nav-bar />
   <div class="container-fluid">
     <div class="row">
-      <side-bar />
-      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 h-100">
+      <!-- side-bar / -->
+      <main class="h-100"> <!--px-md-4 ms-sm-auto col-lg-10  col-md-9 -->
         <router-view></router-view>
       </main>
     </div>
@@ -15,14 +15,15 @@
 </template>
 <script>
 import NavBar from "@/components/NavBar";
-import SideBar from "@/components/SideBar";
+//import SideBar from "@/components/SideBar";
 export default {
   name: 'App',
-  components: {SideBar, NavBar},
+  components: {NavBar},
 }
 </script>
 
 <style>
+
 .sidebar {
   top: 0;
   bottom: 0;
@@ -35,25 +36,6 @@ export default {
   .sidebar {
     top: 5rem;
   }
-}
-
-.sidebar .nav-link {
-  font-weight: 500;
-  color: #333;
-}
-
-.sidebar .nav-link .feather {
-  margin-right: 4px;
-  color: #727272;
-}
-
-.sidebar .nav-link.active {
-  color: #2470dc;
-}
-
-.sidebar .nav-link:hover .feather,
-.sidebar .nav-link.active .feather {
-  color: inherit;
 }
 
 .sidebar-heading {

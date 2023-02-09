@@ -1,5 +1,5 @@
 <template>
-  <nav aria-label="Page navigation example">
+  <nav aria-label="Page navigation">
     <ul class="pagination justify-content-end">
       <li v-bind:class="[CurrentPage === 1 ? disabledPageClass : '', defaultPageClass]">
         <a class="page-link" href="#" aria-label="Previous" @click.prevent.stop="selectPage(CurrentPage-1)">
@@ -7,7 +7,7 @@
         </a>
       </li>
 
-      <li v-for="idx in CountPages" :key="idx" v-bind:class="[idx === CurrentPage ? disabledPageClass : '', defaultPageClass]">
+      <li v-for="idx in CountPages" :key="idx" v-bind:class="[idx === CurrentPage ? activePageClass : '', defaultPageClass]">
         <a class="page-link" href="#" @click.prevent="selectPage(idx)">{{idx}}</a>
       </li>
 
@@ -31,7 +31,7 @@ export default {
   data(){
     return{
       CurrentPage: this.paramCurrentPage,
-
+      activePageClass: 'active',
       disabledPageClass: 'disabled',
       defaultPageClass: 'page-item'
     }

@@ -1,8 +1,7 @@
 package routes
 
 import (
-	"fmt"
-	app "github.com/mikelpsv/mod_micro_app"
+	app "github.com/mlplabs/app-utils"
 	"net/http"
 )
 
@@ -55,6 +54,12 @@ func GetHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func Custom404(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.RequestURI)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Vary", "Accept-Encoding")
+
 	w.WriteHeader(http.StatusNotFound)
 }

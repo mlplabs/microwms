@@ -56,4 +56,29 @@ export default {
     GetHwPrinters(){
         return apiClient.get(`printers`)
     },
+
+    GetReceiptDocs(refName, page, limit, offset){
+        return apiClient.get(`${refName}?l=${limit}&o=${offset}`)
+    },
+    StoreReceiptDoc(refName, detailItem){
+        if (detailItem.id === 0) {
+            return apiClient.post(refName,
+                detailItem,
+                {
+                    headers: {
+                        'Content-type': 'application/x-www-form-urlencoded'
+                    }
+                }
+            )
+        }else {
+            return apiClient.put(refName + '/'+ detailItem.id,
+                detailItem,
+                {
+                    headers: {
+                        'Content-type': 'application/x-www-form-urlencoded'
+                    }
+                }
+            )
+        }
+    },
 }

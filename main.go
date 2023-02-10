@@ -35,36 +35,6 @@ func main() {
 	router.NotFoundHandler = http.HandlerFunc(routes.Custom404)
 	router.Use(mux.CORSMethodMiddleware(router))
 	StartHttpServer(router)
-
-	/*
-		ps := s.GetProductService()
-		ps.GetProductBarcodes(1)
-
-		p := new(models.Product)
-		p.Name = "Тестовый продукт 2"
-		p.Size.SetSize(1, 2,3, 0.8)
-		//p.Store(s)
-
-		p, err := ps.FindProductsByBarcode("1234567890")
-		if err != nil{
-			fmt.Println(err)
-		}
-		fmt.Println(p)
-		products, err := ps.GetProducts()
-		if err != nil{
-			fmt.Println(err)
-		}
-
-		fmt.Println(products)
-	*/
-
-	/*
-		mfs, err := ps.GetManufacturers()
-		if err != nil{
-			fmt.Println(err)
-		}
-		fmt.Println(mfs)
-	*/
 }
 
 func StartHttpServer(router *mux.Router) {
@@ -103,7 +73,7 @@ func RegisterHandlers(routeItems app.Routes, wHandlers *routes.WrapHttpHandlers)
 	routeItems = routes.RegisterManufacturersHandlers(routeItems, wHandlers)
 	routeItems = routes.RegisterHardwareHandlers(routeItems, wHandlers)
 	routeItems = routes.RegisterUsersHandlers(routeItems, wHandlers)
-
+	routeItems = routes.RegisterReceiptHandlers(routeItems, wHandlers)
 	return routeItems
 }
 

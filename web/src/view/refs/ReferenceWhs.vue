@@ -77,7 +77,6 @@
     </div>
   </div>
 
-  <h2></h2>
   <div class="table-responsive">
     <table class="table table-striped table-hover table-bordered">
       <thead>

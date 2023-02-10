@@ -10,8 +10,9 @@
       <input type="text" class="form-control" placeholder="поиск" v-show="isShowSearch">
     </div>
   </div>
-  <div class="table-responsive" style="overflow-x: initial;">
-    <table class="table table-striped table-hover table-bordered">
+    <!--div class="" style="overflow-x: initial;"-->
+    <table class="table table-striped table-hover table-bordered" >
+      <!-- table head -->
       <thead>
       <tr>
         <th scope="col" class="col_head"
@@ -22,42 +23,46 @@
       </tr>
       </thead>
 
+      <!-- table body -->
       <template v-if="rows.length > 0">
         <tbody>
         <tr v-for="(row, j) in rows"  :key="j" @click="$emit('row-clicked', row)">
-          <td v-for="(col, index) in columns"
-              :key="index"
-              :class="{
-                'col_id': col.isKey,
-                'col_action': col.field === 'actions',
-                'text-start': col.align === 0,
-                'text-center': col.align === 1,
-                'text-end': col.align === 2,
-              }"
-          >
+
+          <!-- set column css class -->
+          <td v-for="(col, index) in columns" :key="index" :class="{'col_id': col.isKey, 'col_action': col.field === 'actions', 'text-start': col.align === 0, 'text-center': col.align === 1, 'text-end': col.align === 2 }">
             <template v-if="row.id === 0 && (col.isKey === false && col.field !== 'actions')">
+
+              <!-- select - if values > 0 -->
               <select class="form-select" v-if="col.values !== undefined && col.values.length > 0">
                 <option v-for="(op, h) in col.values" :key="h" value="{{op.key}}">{{op.val}}</option>
               </select>
 
-              <autocomplete-input v-else
+              <!-- suggest - if suggestion > 0 -->
+              <autocomplete-input v-else-if="suggestion.length > 0"
                 v-model:propSelection=row[col.field]
                 v-model:propSuggestions="suggestion">
               </autocomplete-input>
 
+              <!-- input integer if isNum is true -->
+              <input v-else-if="col.isNum" class="form-control text-end" type="number" v-model.number="row[col.field]" />
+
+              <!--  input text -->
+              <input v-else class="form-control" type="text" v-model="row[col.field]" />
             </template>
+
             <template v-else-if="col.field === 'actions'">
               <div class="dropdown">
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
                   <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="#" @click.prevent="$emit('row-delete', row)">Удалить {{row.id}}</a></li>
+                  <li><a class="dropdown-item" href="#" @click.prevent="$emit('row-delete', j)">Удалить {{j}}</a></li>
                   <li><a class="dropdown-item" href="#">Another action {{row.id}}</a></li>
                   <li><a class="dropdown-item" href="#">Something else here</a></li>
                 </ul>
               </div>
             </template>
+
             <template v-else>
               <span v-if="col.values !== undefined && col.values.length > 0">{{getEnumValue(row, col)}}</span>
               <span v-else>{{row[col.field]}}</span>
@@ -72,8 +77,6 @@
 
     <pagination-bar v-show="isShowPaging" v-bind:param-current-page=currentPage v-bind:param-count-rows=countRows v-bind:param-limit-rows=limitRows v-on:selectPage="$emit('page-selected', 1)"></pagination-bar>
   </div>
-
-</div>
 </template>
 
 <script>
@@ -199,4 +202,14 @@ td.col_id{
 td.col_action{
   text-align: center;
 }
+/* (-) стрелки input type number */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 </style>

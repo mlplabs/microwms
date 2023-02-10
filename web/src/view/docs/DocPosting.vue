@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="detailForm" class="modal fade" tabindex="-1">
-      <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">{{ lng.title_form_create }}</h5>
@@ -19,48 +19,18 @@
                 <input type="text" class="form-control" id="inputDate" v-model="detailItem.date">
               </div>
 
-              <div class="col-12">
+              <div class="col-12 table-responsive-xl">
 
                 <inline-table
                   :columns="productColumns"
-                  :rows="detailItem.products"
+                  :rows="detailItem.items"
                   :is-show-paging="false"
                   :is-show-search="false"
-                  @row-clicked="onRowClick"
-                  @new-item-clicked="onNewItem"
+                  @row-clicked="onClickFormRow"
+                  @new-item-clicked="onNewItemForm"
+                  @row-delete="onDeleteFormRow"
 
                 ></inline-table>
-
-
-                <!--
-                                <inline-table
-                  :is-show-paging="false"
-                  :is-show-search="false"
-                  :rows="detailItem.barcodes"
-                  :columns="barcodesColumns"
-                  @new-item-clicked="onNewItem"
-                  @row-delete="onDeleteItem">
-                </inline-table>
-                -->
-
-                <!-- div class="table-responsive">
-                  <table class="table table-striped table-hover table-bordered">
-                    <thead>
-                    <tr>
-                      <th scope="col" class="col_head col_id">#</th>
-                      <th scope="col" class="col_head">Наименование</th>
-                      <th scope="col" class="col_head col_action">...</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="(item, index) in tableData" :key="index">
-                      <td class="col_id">{{ item.id }}</td>
-                      <td><input type="text"></td>
-                      <td class="col_action"><button type="button" class="btn" @click="deleteRow(index)"><i class="bi bi-journal-x text-danger"></i></button> </td>
-                    </tr>
-                    </tbody>
-                  </table>
-                </div -->
 
               </div>
             </form>
@@ -83,37 +53,94 @@
       </div>
     </div>
   </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+      <tr>
+        <th scope="col" class="col_head col_id">#</th>
+        <th scope="col" class="col_head">Номер</th>
+        <th scope="col" class="col_head">Дата</th>
+        <th scope="col" class="col_head col_action">...</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-for="(item, index) in tableData" :key="index">
+        <td class="col_id">{{ item.id }}</td>
+        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.number }}</a></td>
+        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.date }}</a></td>
+        <td class="col_action">
+          <div class="dropdown">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" @click.prevent="deleteItem(item.id)">Удалить {{item.name}}</a></li>
+              <!--li><a class="dropdown-item" href="#">Another action {{item.id}}</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li-->
+            </ul>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <pagination-bar v-bind:param-current-page="currentPage" v-bind:param-count-rows=countRows v-bind:param-limit-rows=limitRows v-on:selectPage="onSelectPage"></pagination-bar>
 </template>
 
 <script>
 
 import InlineTable from "@/components/InlineTable";
+import DataProvider from "@/services/DataProvider";
 export default {
   name: "DocPosting",
   components: {InlineTable},
   data(){
     return{
+      countRows: 0,
+      limitRows: 11,
+      currentPage: 1,
       detailItem:{
+        id: 0,
         number: "",
         date: "08.02.2023",
-        products: [],
+        items: [],
       },
       tableData: [],
-      tableItem:{
-        id: 0,
-        name: ''
-      },
+
       productColumns: [
         {
           label: "#",
           field: "id",
           isKey: true,
+          isNum: true,
           editable: false,
           align: 2
         },
         {
           label: "Наименование",
-          field: "name",
+          field: "product_name",
+          isKey: false,
+          editable: false,
+          align: 0
+        },
+        {
+          label: "Производитель",
+          field: "product_manufacturer",
+          isKey: false,
+          editable: false,
+          align: 0
+        },
+        {
+          label: "Штрих-код",
+          field: "product_barcode",
+          isKey: false,
+          editable: false,
+          align: 0
+        },
+        {
+          label: "Ячейка",
+          field: "cell",
           isKey: false,
           editable: false,
           align: 0
@@ -122,6 +149,7 @@ export default {
           label: "Количество",
           field: "quantity",
           isKey: false,
+          isNum: true,
           editable: true,
           align: 2
         },
@@ -146,35 +174,90 @@ export default {
 
   methods:{
     storeItem(){
-
+      console.log(this.detailItem)
+      DataProvider.StoreReceiptDoc("receipt", this.detailItem)
+        .then((response) => {
+          const storeId = response.data;
+          if (storeId > 0) {
+            this.updateItemsOnPage(this.currentPage)
+          }
+        })
+        .catch(error => { this.errorProc(error) });
     },
     closeDetailForm(){
-
     },
     showDetailForm(){
-    },
-    addRow(){
-      this.rows.push({id:99, name: 'asdfasd '})
     },
     deleteRow(idx){
       console.log('delete ' + idx)
       this.tableData.splice(idx+1, 1)
     },
-    onRowClick(eventData){
-      console.log(eventData)
+
+    updateItemsOnPage(page){
+      let offset = ( page -1 ) * this.limitRows
+      DataProvider.GetReceiptDocs("receipt", page, this.limitRows, offset)
+        .then((response) => {
+          console.log(response.data)
+          this.tableData = response.data.data
+          this.countRows = response.data.header.count
+        })
+        .catch(error => { this.errorProc(error) });
     },
-    onNewItem(){
-      let newBc = this.detailItem.products.find(item => item.name === "");
+
+
+
+
+    onNewItemForm(){
+      let newBc = this.detailItem.items.find(item => item.name === "");
       if (newBc !== undefined){
         return
       }
-      this.detailItem.products.push({id: 0, name: ""})
+      this.detailItem.items.push({id: 0, product_name: "", product_manufacturer: "", product_barcode: "", cell:"", quantity: 0})
     },
-  }
+    onDeleteFormRow(idx){
+      console.log('delete ' + idx)
+      this.detailItem.items.splice(idx, 1)
+    },
+    onClickFormRow(eventData){
+      console.log(eventData)
+    },
+    errorProc(error){
+      console.log(error)
+      if (error.response) {
+        // client received an error response (5xx, 4xx)
+        if (error.response.status === 404){
+          this.statusText = "Ничего не найдено ("
+        }else {
+          this.statusText = "Произошла ошибка ("+error.response.status+")"
+        }
+      } else if (error.request) {
+        // client never received a response, or request never left
+      } else {
+        // anything else
+      }
 
+    }
+  },
+  mounted() {
+    this.updateItemsOnPage(this.currentPage)
+  }
 }
 </script>
 
 <style scoped>
-
+th.col_head{
+  text-align: center;
+}
+th.col_id {
+  width: 30px;
+}
+th.col_action {
+  width: 20px;
+}
+td.col_id{
+  text-align: right;
+}
+td.col_action{
+  text-align: center;
+}
 </style>

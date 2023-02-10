@@ -81,5 +81,7 @@ github.com/mlplabs/microwms-core v0.0.0-20230209102045-a1b6c44e874a h1:gxx/imk4R
 github.com/mlplabs/microwms-core v0.0.0-20230209102045-a1b6c44e874a/go.mod h1:H968aB8ZdZnWOnJh/xCM8/u1/5jccXi9FmdoD3TgrHw=
 github.com/mlplabs/microwms-core v0.0.0-20230209103655-28f07e3a569b h1:SkrQ4RbcMxMbj0JUwuw9LxJBaqUDKTGAg4gvdRrWjUE=
 github.com/mlplabs/microwms-core v0.0.0-20230209103655-28f07e3a569b/go.mod h1:H968aB8ZdZnWOnJh/xCM8/u1/5jccXi9FmdoD3TgrHw=
+github.com/mlplabs/microwms-core v0.0.0-20230210150629-79c9cdedc112 h1:b5Es59Y/khnWBQcr7HSXk1kp/dyttRX+8SRI2ephNfY=
+github.com/mlplabs/microwms-core v0.0.0-20230210150629-79c9cdedc112/go.mod h1:H968aB8ZdZnWOnJh/xCM8/u1/5jccXi9FmdoD3TgrHw=
 golang.org/x/crypto v0.5.0 h1:U/0M97KRkSFvyD/3FSmdP5W5swImpNgle/EHFhOsQPE=
 golang.org/x/crypto v0.5.0/go.mod h1:NK/OQwhpMQP3MwtdjgLlYHnH9ebylxKWv3e0fK+mkQU=

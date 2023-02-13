@@ -16,7 +16,8 @@
                 <label for="inputMnf" class="form-label">Наименование</label>
                 <autocomplete-input
                   v-model:prop-suggestions="barcodesSuggestion"
-                  v-model:prop-selection="detailItem.name"
+                  v-model:prop-selection-id="detailItem.id"
+                  v-model:prop-selection-val="detailItem.name"
                   @onUpdateData="updateManufacturersData">
                 </autocomplete-input>
               </div>

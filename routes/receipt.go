@@ -3,6 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	app "github.com/mlplabs/app-utils"
 	"github.com/mlplabs/microwms-core/core"
 	"github.com/mlplabs/microwms-core/models"
@@ -30,14 +31,14 @@ func RegisterReceiptHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers)
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.GetReceiptDocs,
 	})
-	//routeItems = append(routeItems, app.Route{
-	//	Name:          "GetUser",
-	//	Method:        "GET",
-	//	Pattern:       "/users/{id}",
-	//	SetHeaderJSON: true,
-	//	ValidateToken: false,
-	//	HandlerFunc:   wHandlers.GetUserById,
-	//})
+	routeItems = append(routeItems, app.Route{
+		Name:          "GetReceiptDoc",
+		Method:        "GET",
+		Pattern:       "/receipt/{id}",
+		SetHeaderJSON: true,
+		ValidateToken: false,
+		HandlerFunc:   wHandlers.GetReceiptDoc,
+	})
 	routeItems = append(routeItems, app.Route{
 		Name:          "CreateReceiptDoc",
 		Method:        "POST",
@@ -168,4 +169,55 @@ func (wh *WrapHttpHandlers) CreateReceiptDoc(w http.ResponseWriter, r *http.Requ
 	}
 
 	app.ResponseJSON(w, http.StatusOK, id)
+}
+
+func (wh *WrapHttpHandlers) GetReceiptDoc(w http.ResponseWriter, r *http.Request) {
+	type InDoc struct {
+		Id     int    `json:"id"`
+		Number string `json:"number"`
+		Date   string `json:"date"`
+		Items  []struct {
+			ProductId   int    `json:"id"`
+			ProductName string `json:"product_name"`
+			Quantity    int    `json:"quantity"`
+		} `json:"items"`
+	}
+
+	var err error
+	var doc *models.DocItem
+	vars := mux.Vars(r)
+
+	if v, ok := vars["id"]; !ok || v == "0" {
+		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
+		return
+	}
+
+	ref := wh.Storage.GetDocReceipt()
+
+	valId, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
+		return
+	}
+	doc, err = ref.GetById(int64(valId))
+	if err != nil {
+		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
+		return
+	}
+
+	d := InDoc{
+		Id:     int(doc.Id),
+		Number: doc.Number,
+		Date:   doc.Date,
+	}
+	for _, v := range doc.Items {
+		r := struct {
+			ProductId   int    `json:"id"`
+			ProductName string `json:"product_name"`
+			Quantity    int    `json:"quantity"`
+		}{int(v.Product.Id), v.Product.Name, v.Quantity}
+		d.Items = append(d.Items, r)
+	}
+
+	app.ResponseJSON(w, http.StatusOK, d)
 }

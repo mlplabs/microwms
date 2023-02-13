@@ -313,6 +313,5 @@ func (wh *WrapHttpHandlers) GetSuggestionProducts(w http.ResponseWriter, r *http
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 		return
 	}
-
 	app.ResponseJSON(w, http.StatusOK, data)
 }

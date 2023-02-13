@@ -56,7 +56,9 @@ export default {
     GetHwPrinters(){
         return apiClient.get(`printers`)
     },
-
+    GetReceiptDoc(refName, id){
+        return apiClient.get(`${refName}/${id}`)
+    },
     GetReceiptDocs(refName, page, limit, offset){
         return apiClient.get(`${refName}?l=${limit}&o=${offset}`)
     },

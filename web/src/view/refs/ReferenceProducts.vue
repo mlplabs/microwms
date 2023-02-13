@@ -16,7 +16,8 @@
                 <label for="inputName" class="form-label">Наименование</label>
                 <autocomplete-input
                   v-model:prop-suggestions="productsSuggestion"
-                  v-model:prop-selection="detailItem.name"
+                  v-model:prop-selection-id="detailItem.id"
+                  v-model:prop-selection-val="detailItem.name"
                   @onUpdateData="updateProductsData">
                 </autocomplete-input>
 
@@ -27,7 +28,8 @@
                   <label for="inputMnf" class="form-label">Производитель</label>
                   <autocomplete-input
                     v-model:prop-suggestions="manufacturersSuggestion"
-                    v-model:prop-selection="detailItem.manufacturer.name"
+                    v-model:prop-selection-id="detailItem.manufacturer.id"
+                    v-model:prop-selection-val="detailItem.manufacturer.name"
                     @onUpdateData="updateManufacturersData">
                   </autocomplete-input>
                 </div>

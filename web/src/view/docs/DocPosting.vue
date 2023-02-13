@@ -24,11 +24,13 @@
                 <inline-table
                   :columns="productColumns"
                   :rows="detailItem.items"
+                  :suggestionData="suggestion"
                   :is-show-paging="false"
                   :is-show-search="false"
                   @row-clicked="onClickFormRow"
                   @new-item-clicked="onNewItemForm"
                   @row-delete="onDeleteFormRow"
+                  @update-suggestion="onUpdateSuggestion"
 
                 ></inline-table>
 
@@ -92,9 +94,11 @@
 
 import InlineTable from "@/components/InlineTable";
 import DataProvider from "@/services/DataProvider";
+import PaginationBar from "@/components/PaginationBar";
+
 export default {
   name: "DocPosting",
-  components: {InlineTable},
+  components: {InlineTable, PaginationBar},
   data(){
     return{
       countRows: 0,
@@ -107,42 +111,41 @@ export default {
         items: [],
       },
       tableData: [],
-
+      suggestion: [],
       productColumns: [
         {
           label: "#",
           field: "id",
           isKey: true,
           isNum: true,
-          editable: false,
           align: 2
         },
         {
           label: "Наименование",
           field: "product_name",
           isKey: false,
-          editable: false,
-          align: 0
+          suggestion: true,
+          align: 0,
         },
         {
           label: "Производитель",
           field: "product_manufacturer",
           isKey: false,
-          editable: false,
+          suggestion: true,
           align: 0
         },
         {
           label: "Штрих-код",
           field: "product_barcode",
           isKey: false,
-          editable: false,
+          suggestion: true,
           align: 0
         },
         {
           label: "Ячейка",
           field: "cell",
           isKey: false,
-          editable: false,
+          suggestion: true,
           align: 0
         },
         {
@@ -150,14 +153,12 @@ export default {
           field: "quantity",
           isKey: false,
           isNum: true,
-          editable: true,
           align: 2
         },
         {
           label: "Действия",
           field: "actions",
           isKey: false,
-          editable: false,
           align: 1
         }
       ],
@@ -173,6 +174,8 @@ export default {
   },
 
   methods:{
+    closeDetailForm(){
+    },
     storeItem(){
       console.log(this.detailItem)
       DataProvider.StoreReceiptDoc("receipt", this.detailItem)
@@ -184,13 +187,37 @@ export default {
         })
         .catch(error => { this.errorProc(error) });
     },
-    closeDetailForm(){
+    resetDetailItem(){
+      this.detailItem = {
+        id: 0,
+        number: '',
+        date: '',
+        items: []
+      }
+
     },
-    showDetailForm(){
+
+    showDetailForm(id){
+      this.resetDetailItem()
+      if (id === 0) {
+        return
+      }
+      this.getDetailItem(id)
     },
     deleteRow(idx){
       console.log('delete ' + idx)
       this.tableData.splice(idx+1, 1)
+    },
+
+    getDetailItem(id){
+      DataProvider.GetReceiptDoc("receipt", id)
+        .then((response) => {
+          this.detailItem = response.data
+        })
+        .catch(error => { this.errorProc(error) });
+    },
+    onSelectPage(){
+
     },
 
     updateItemsOnPage(page){
@@ -205,7 +232,32 @@ export default {
     },
 
 
+    onUpdateSuggestion(emitData){
+      console.log('suggestion update for ' + emitData.key + ' ' + emitData.val)
+      if(emitData.key === "product_name"){
+        this.updateProductsData(emitData)
+      }
+      if(emitData.key === "product_manufacturer"){
+        this.updateManufacturersData(emitData)
+      }
 
+    },
+    updateProductsData(emitData){
+      DataProvider.GetSuggestionReference('products', emitData.val)
+        .then((response) => {
+          console.log(response.data)
+          this.suggestion = response.data
+        })
+        .catch(error => { this.errorProc(error) });
+    },
+
+    updateManufacturersData(emitData){
+      DataProvider.GetSuggestionReference('manufacturers', emitData.val)
+        .then((response) => {
+          this.suggestion = response.data
+        })
+        .catch(error => { this.errorProc(error) });
+    },
 
     onNewItemForm(){
       let newBc = this.detailItem.items.find(item => item.name === "");

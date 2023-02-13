@@ -38,12 +38,14 @@
               </select>
 
               <!-- suggest - if suggestion > 0 -->
-              <autocomplete-input v-else-if="suggestion.length > 0"
+              <autocomplete-input v-else-if="col.suggestion === true"
                 v-model:propSelection=row[col.field]
-                v-model:propSuggestions="suggestion">
+                v-model:propSuggestions="suggestionValue"
+                v-model:prop-key="col.field"
+                @onUpdateData="$emit('update-suggestion', $event)">
               </autocomplete-input>
 
-              <!-- input integer if isNum is true -->
+              <!-- input integer if isNum is true $emit('update-suggestion') -->
               <input v-else-if="col.isNum" class="form-control text-end" type="number" v-model.number="row[col.field]" />
 
               <!--  input text -->
@@ -108,15 +110,28 @@ export default {
     isShowSearch:{
       type: Boolean,
       default: true,
+    },
+    suggestionData:{
+      type: Array,
+      default: () => {
+        return [];
+      },
     }
+
   },
   data(){
     return{
       currentPage: 1,
       countRows: 30,
       limitRows: 5,
-      suggestion: []
     }
+  },
+  computed:{
+    suggestionValue:{
+      get(){
+        return this.suggestionData
+      },
+    },
   },
   methods:{
     getEnumValue(row, col){
@@ -125,7 +140,7 @@ export default {
         return ''
       }
       return i.val
-    }
+    },
   },
   setup(props){
     const setting = reactive({

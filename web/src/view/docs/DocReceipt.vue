@@ -95,28 +95,24 @@ export default {
           label: "#",
           field: "id",
           isKey: true,
-          editable: false,
           align: 2
         },
         {
           label: "Наименование",
           field: "name",
           isKey: false,
-          editable: false,
           align: 0
         },
         {
           label: "Количество",
           field: "quantity",
           isKey: false,
-          editable: true,
           align: 2
         },
         {
           label: "Действия",
           field: "actions",
           isKey: false,
-          editable: false,
           align: 1
         }
       ],

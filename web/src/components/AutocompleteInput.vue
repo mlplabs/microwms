@@ -1,18 +1,20 @@
 <template>
-  <div class="dropdown" style="position:relative">
-    <input class="form-control" type="text" v-model="textValue"
-           @keydown.enter = 'enter'
-           @keydown.down = 'down'
-           @keydown.up = 'up'
-           @input = 'change'
-           @click = 'click'
-           @keydown = 'keypress'
-    />
-    <ul class="dropdown-menu" style="width:100%" v-bind:class="{'show':openSuggestion}">
-      <li class="dropdown-item" v-for="(suggestion, index) in matches" :key="index" v-bind:class="{'active': isActive(index)}" @click="selectSuggestion(index)" style="padding: 5px;">
-        <a href="#" @click.prevent>{{ suggestion }}</a>
+  <div>
+  <input class="form-control" type="text" v-model="textValue"
+         @keydown.enter = 'enter'
+         @keydown.down = 'down'
+         @keydown.up = 'up'
+         @input = 'change'
+         @click = 'click'
+         @keydown = 'keypress'
+  />
+  <div class="dropdown" style="position:relative; min-width: inherit">
+    <ul class="dropdown-menu" v-bind:class="{'show':openSuggestion}">
+      <li class="dropdown-item" v-for="(item, index) in matches" :key="index" v-bind:class="{'active': isActive(index)}" @click="selectSuggestion(index)" style="padding: 5px;">
+        <a href="#" @click.prevent>{{ item.val }}</a>
       </li>
     </ul>
+  </div>
   </div>
 </template>
 
@@ -21,7 +23,12 @@
 /*
   AutocompleteInput component
   example:
-    <autocomplete-input v-model:prop-suggestions="dataArray" v-model:prop-selection="value" @onUpdateData="eventArrayUpdate"></autocomplete-input>
+    <autocomplete-input
+      v-model:prop-suggestions="dataArray"  // массив значений  [{id: 1 val: text 1}, {id: 3 val: text 3}]
+      v-model:prop-selection-val="value_id" // значение выбора, ключ
+      v-model:prop-selection-val="value_str"  // значение выбора, строка
+      @onUpdateData="eventArrayUpdate"> // событие родителю о введенном тексте для обновления dataArray
+    </autocomplete-input>
 */
 
 export default {
@@ -38,7 +45,10 @@ export default {
       type: Array,
       required: true
     },
-    propSelection: {
+    propSelectionId:{
+      type: Number,
+    },
+    propSelectionVal:{
       type: String,
     },
     propKey:{
@@ -49,15 +59,23 @@ export default {
   computed: {
     textValue:{
       get(){
-        return this.propSelection
+        return this.propSelectionVal
       },
       set(value){
-        this.$emit('update:propSelection', value)
+        this.$emit('update:propSelectionVal', value)
+      }
+    },
+    idValue:{
+      get(){
+        return this.propSelectionId
+      },
+      set(value){
+        this.$emit('update:propSelectionId', value)
       }
     },
     matches() {
       return this.propSuggestions.filter((str) => {
-        return str.indexOf(this.textValue) >= 0;
+        return str.val.indexOf(this.textValue) >= 0;
       });
     },
     openSuggestion() {
@@ -69,8 +87,10 @@ export default {
 
   methods: {
     enter() {
-      if (this.open)
-        this.textValue = this.matches[this.current];
+      if (this.open) {
+        this.textValue = this.matches[this.current].val;
+        this.idValue = this.matches[this.current].id;
+      }
       this.open = false;
     },
     up() {
@@ -94,21 +114,20 @@ export default {
     },
     keypress(event){
       const val = event.target.value
-      console.log(val)
+      console.log(this.matches)
       if (val === ''){
         console.log('text val is empty ' + val)
         return
       }
-      this.$emit('onUpdateData',
-        {
+      this.$emit('onUpdateData', {
           val:val,
           key:this.propKey
         }
       )
     },
     selectSuggestion(index) {
-      console.log(this.matches[index])
-      this.textValue = this.matches[index];
+      this.textValue = this.matches[index].val;
+      this.idValue = this.matches[index].id;
       this.open = false;
     },
     isActive(index) {

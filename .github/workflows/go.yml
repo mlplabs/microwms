@@ -20,7 +20,9 @@ jobs:
 #   run: go test -v ./...
 
     - name: build
-      run: mkdir builds && GOOS=linux GOARCH=amd64 go build -race -ldflags "-extldflags '-static'" -o build/mwms
+      run: |
+        apt-get install -y libcups2-dev
+        mkdir builds && GOOS=linux GOARCH=amd64 go build -race -ldflags "-extldflags '-static'" -o build/mwms
       
     - name: build_front
       run: |

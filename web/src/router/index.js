@@ -5,7 +5,6 @@ import ReferenceProducts from "@/view/refs/ReferenceProducts";
 import ReferenceManufacturers from "@/view/refs/ReferenceManufacturers";
 import ReferenceWhs from "@/view/refs/ReferenceWhs";
 import ReferenceBarcodes from "@/view/refs/ReferenceBarcodes";
-import ReceiptView from "@/view/ReceiptView";
 import ShipmentView from "@/view/ShipmentView";
 import ReportsView from "@/view/ReportsView";
 import PropertiesView from "@/view/PropertiesView";
@@ -13,7 +12,6 @@ import GlobalSearchView from "@/view/GlobalSearchView";
 import DocShipment from "@/view/docs/DocShipment";
 import DocWriteOff from "@/view/docs/DocWriteOff";
 import DocReceipt from "@/view/docs/DocReceipt";
-import DocPosting from "@/view/docs/DocPosting";
 import HardwarePrinters from "@/view/hardware/preference/HardwarePrinters";
 import ReferenceUsers from "@/view/refs/ReferenceUsers";
 
@@ -59,21 +57,6 @@ const routes = [
         component: ReferenceUsers
     },
     {
-        path: '/receipt',
-        name: 'ReceiptView',
-        component: ReceiptView
-    },
-    {
-        path: '/docs/receipt',
-        name: 'DocReceipt',
-        component: DocReceipt
-    },
-    {
-        path: '/docs/posting',
-        name: 'DocPosting',
-        component: DocPosting
-    },
-    {
         path: '/shipment',
         name: 'ShipmentView',
         component: ShipmentView
@@ -82,6 +65,11 @@ const routes = [
         path: '/docs/shipment',
         name: 'DocShipment',
         component: DocShipment
+    },
+    {
+        path: '/docs/receipt',
+        name: 'DocReceipt',
+        component: DocReceipt
     },
     {
         path: '/docs/write-off',

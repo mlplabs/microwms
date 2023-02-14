@@ -24,7 +24,7 @@
             <ul class="dropdown-menu" aria-labelledby="dropdown05">
               <li><router-link to="/refs" class="dropdown-item">Справочники</router-link></li>
               <li><router-link to="/shipment" class="dropdown-item">Отгрузки</router-link></li>
-              <li><router-link to="/receipt" class="dropdown-item">Поступления</router-link></li>
+              <li><router-link to="/docs/receipt" class="dropdown-item">Поступления</router-link></li>
               <li class="dropdown-divider"></li>
               <li><router-link to="/props" class="dropdown-item">Настройки</router-link></li>
               <!--

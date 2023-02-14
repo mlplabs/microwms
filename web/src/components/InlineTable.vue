@@ -39,8 +39,8 @@
 
               <!-- suggest - if suggestion > 0 -->
               <autocomplete-input v-else-if="col.suggestion === true"
-                v-model:propSelection=row[col.field]
-                v-model:propSuggestions="suggestionValue"
+                v-model:prop-selection-val=row[col.field]
+                v-model:prop-suggestions="suggestionValue"
                 v-model:prop-key="col.field"
                 @onUpdateData="$emit('update-suggestion', $event)">
               </autocomplete-input>

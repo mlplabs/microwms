@@ -4,7 +4,7 @@
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 v-if="detailItem.id === 0" class="modal-title">{{ lng.title_form_create }}</h5>
+            <h5 v-if="detailItem.isNew" class="modal-title">{{ lng.title_form_create }}</h5>
             <h5 v-else class="modal-title">{{lng.title_form_edit}}</h5>
 
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closeDetailForm"></button>
@@ -15,7 +15,7 @@
               <div class="mb-3">
                 <label for="inputMnf" class="form-label">Наименование</label>
                 <autocomplete-input
-                  v-model:prop-suggestions="manufacturersSuggestion"
+                  v-model:prop-suggestions="userSuggestion"
                   v-model:prop-selection-id="detailItem.id"
                   v-model:prop-selection-val="detailItem.name"
                   @onUpdateData="updateManufacturersData">
@@ -95,10 +95,11 @@ export default {
       limitRows: 7,
       currentPage: 1,
       detailItem: {
+        isNew: false,
         id: 0,
         name: "",
       },
-      manufacturersSuggestion: [],
+      userSuggestion: [],
       columns: [
         {
           label: "#",
@@ -130,7 +131,8 @@ export default {
   methods:{
     showDetailForm(id){
       this.resetDetailItem()
-      if (id === 0) {
+      this.detailItem.isNew = (id === 0)
+      if (this.detailItem.isNew) {
         return
       }
       this.getDetailItem(id)
@@ -140,8 +142,11 @@ export default {
     },
 
     resetDetailItem(){
-      this.detailItem.id = 0
-      this.detailItem.name = ''
+      this.detailItem = {
+        id: 0,
+        name: ''
+      }
+      this.userSuggestion = []
     },
 
     onSelectPage(eventData){

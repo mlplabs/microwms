@@ -11,7 +11,7 @@ const apiClient = axios.create({
 
 export default {
     StoreItemReference(refName, detailItem){
-        if (detailItem.id === 0) {
+        if (detailItem.isNew) {
             return apiClient.post(refName,
                 detailItem,
                 {

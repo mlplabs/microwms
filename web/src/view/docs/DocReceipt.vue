@@ -31,7 +31,7 @@
                   @new-item-clicked="onNewItemForm"
                   @row-delete="onDeleteFormRow"
                   @update-suggestion="onUpdateSuggestion"
-
+                  @select-suggestion="onSelectSuggestion"
                 ></inline-table>
 
               </div>
@@ -123,6 +123,7 @@ export default {
         {
           label: "Наименование",
           field: "product_name",
+          field_id: "id",
           isKey: false,
           suggestion: true,
           align: 0,
@@ -175,6 +176,7 @@ export default {
 
   methods:{
     closeDetailForm(){
+
     },
     storeItem(){
       console.log(this.detailItem)
@@ -231,9 +233,25 @@ export default {
         .catch(error => { this.errorProc(error) });
     },
 
+     fillProductRow(row){
+       DataProvider.GetItemReference('products', row.id)
+         .then((response) => {
+           //this.detailItem = response.data
+           console.log(response.data)
+           row.product_manufacturer =response.data.manufacturer.name
+         })
+         .catch(error => { this.errorProc(error) });
+     },
+
+    onSelectSuggestion(emitRow){
+      if (emitRow.id !== 0) {
+        this.fillProductRow(emitRow)
+      }
+    },
+
 
     onUpdateSuggestion(emitData){
-      console.log('suggestion update for ' + emitData.key + ' ' + emitData.val)
+      //console.log('suggestion update for ' + emitData.key + ' ' + emitData.val)
       if(emitData.key === "product_name"){
         this.updateProductsData(emitData)
       }

@@ -39,13 +39,16 @@
 
               <!-- suggest - if suggestion > 0 -->
               <autocomplete-input v-else-if="col.suggestion === true"
+                v-model:prop-selection-id=row[col.field_id]
                 v-model:prop-selection-val=row[col.field]
                 v-model:prop-suggestions="suggestionValue"
                 v-model:prop-key="col.field"
-                @onUpdateData="$emit('update-suggestion', $event)">
+                @onUpdateData="$emit('update-suggestion', $event)"
+                @onSelectData="$emit('select-suggestion', row, $event)"
+              >
               </autocomplete-input>
 
-              <!-- input integer if isNum is true $emit('update-suggestion') -->
+              <!-- input integer if isNum is true -->
               <input v-else-if="col.isNum" class="form-control text-end" type="number" v-model.number="row[col.field]" />
 
               <!--  input text -->
@@ -117,7 +120,6 @@ export default {
         return [];
       },
     }
-
   },
   data(){
     return{

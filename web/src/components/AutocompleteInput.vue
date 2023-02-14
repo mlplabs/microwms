@@ -1,16 +1,16 @@
 <template>
   <div>
   <input class="form-control" type="text" v-model="textValue"
-         @keydown.enter = 'enter'
-         @keydown.down = 'down'
-         @keydown.up = 'up'
-         @input = 'change'
-         @click = 'click'
-         @keydown = 'keypress'
+         @keydown.enter = 'onEnter'
+         @keydown.down = 'onKeyDown'
+         @keydown.up = 'onKeyUp'
+         @input = 'onChange'
+         @click = 'onClick'
+         @keydown = 'onKeypress'
   />
   <div class="dropdown" style="position:relative; min-width: inherit">
     <ul class="dropdown-menu" v-bind:class="{'show':openSuggestion}">
-      <li class="dropdown-item" v-for="(item, index) in matches" :key="index" v-bind:class="{'active': isActive(index)}" @click="selectSuggestion(index)" style="padding: 5px;">
+      <li class="dropdown-item" v-for="(item, index) in matches" :key="index" v-bind:class="{'active': isActive(index)}" @click="onSelect(index)" style="padding: 5px;">
         <a href="#" @click.prevent>{{ item.val }}</a>
       </li>
     </ul>
@@ -86,33 +86,34 @@ export default {
   },
 
   methods: {
-    enter() {
+    onEnter() {
       if (this.open) {
         this.textValue = this.matches[this.current].val;
         this.idValue = this.matches[this.current].id;
+        this.$emit('onSelectData', { val:this.matches[this.current].val, key:this.matches[this.current].id } )
       }
       this.open = false;
     },
-    up() {
+    onKeyUp() {
       if(this.current > 0)
         this.current--;
     },
-    down() {
+    onKeyDown() {
       if(this.current < this.matches.length - 1)
         this.current++;
     },
-    change() {
+    onChange() {
       if (this.open === false) {
         this.open = true;
         this.current = 0;
       }
     },
-    click(){
+    onClick(){
       if (this.open){
         this.open = false
       }
     },
-    keypress(event){
+    onKeypress(event){
       const val = event.target.value
       console.log(this.matches)
       if (val === ''){
@@ -125,15 +126,18 @@ export default {
         }
       )
     },
-    selectSuggestion(index) {
-      this.textValue = this.matches[index].val;
-      this.idValue = this.matches[index].id;
+    onSelect(index) {
+      if (this.open) {
+        this.textValue = this.matches[index].val;
+        this.idValue = this.matches[index].id;
+        this.$emit('onSelectData', { val:this.matches[index].val, key:this.matches[index].id } )
+      }
       this.open = false;
+
     },
     isActive(index) {
       return index === this.current;
     },
-
   },
 }
 </script>

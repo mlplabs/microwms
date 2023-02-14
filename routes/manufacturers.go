@@ -219,7 +219,6 @@ func (wh *WrapHttpHandlers) DeleteManufacturer(w http.ResponseWriter, r *http.Re
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
 		return
 	}
-
 	ref := wh.Storage.GetRefManufacturers()
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {

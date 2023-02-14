@@ -22,8 +22,7 @@ jobs:
     - name: build
       run: |
         sudo apt-get install -y libcups2-dev
-        mkdir builds && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -race -ldflags -o build/mwms
-# "-extldflags '-static'"
+        mkdir builds && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -race -ldflags "-extldflags '-static'" -o build/mwms
       
     - name: build_front
       run: |

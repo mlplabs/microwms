@@ -3,10 +3,11 @@ module github.com/mlplabs/microwms
 go 1.18
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/gorilla/mux v1.8.0
 	github.com/mikelpsv/go-cups-mod v0.0.0-20230127151145-d676bd33659e
 	github.com/mlplabs/app-utils v0.0.0-20221215103534-d034b483b7e2
-	github.com/mlplabs/microwms-core v0.0.0-20230213150438-8512b486b7ab
+	github.com/mlplabs/microwms-core v0.0.0-20230214150758-04b66a69e40b
 )
 
 require (

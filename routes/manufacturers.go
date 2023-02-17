@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	app "github.com/mlplabs/app-utils"
 	"github.com/mlplabs/microwms-core/core"
-	"github.com/mlplabs/microwms-core/models"
+	"github.com/mlplabs/microwms-core/whs"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -18,7 +18,7 @@ type GetManufacturersResponse struct {
 		Offset int `json:"offset"`
 		Count  int `json:"count"`
 	} `json:"header"`
-	Data []models.Manufacturer `json:"data"`
+	Data []whs.Manufacturer `json:"data"`
 }
 
 func RegisterManufacturersHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) app.Routes {
@@ -83,15 +83,14 @@ func (wh *WrapHttpHandlers) CreateManufacturer(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	data := new(models.Manufacturer)
+	data := new(whs.Manufacturer)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
 		return
 	}
 
-	ref := wh.Storage.GetRefManufacturers()
-	mnf, err := ref.Create(data)
+	mnf, err := wh.Storage.CreateManufacturer(data)
 	if err != nil {
 		if err, ok := err.(*core.WrapError); !ok {
 			fmt.Println(err)
@@ -108,7 +107,7 @@ func (wh *WrapHttpHandlers) CreateManufacturer(w http.ResponseWriter, r *http.Re
 
 func (wh *WrapHttpHandlers) GetManufacturerById(w http.ResponseWriter, r *http.Request) {
 	var err error
-	var mnf *models.Manufacturer
+	var mnf *whs.Manufacturer
 	vars := mux.Vars(r)
 
 	if v, ok := vars["id"]; !ok || v == "0" {
@@ -116,14 +115,12 @@ func (wh *WrapHttpHandlers) GetManufacturerById(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	ref := wh.Storage.GetRefManufacturers()
-
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
-	mnf, err = ref.FindById(int64(valId))
+	mnf, err = wh.Storage.FindManufacturerById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
@@ -144,15 +141,14 @@ func (wh *WrapHttpHandlers) GetManufacturers(w http.ResponseWriter, r *http.Requ
 		limit = 0
 	}
 
-	ref := wh.Storage.GetRefManufacturers()
-	mnfs, count, err := ref.GetItems(offset, limit, 0)
+	mnfs, count, err := wh.Storage.GetManufacturersItems(offset, limit, 0)
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 	}
 
 	response := GetManufacturersResponse{}
-	response.Data = make([]models.Manufacturer, 0)
+	response.Data = make([]whs.Manufacturer, 0)
 
 	response.Header.Limit = limit
 	response.Header.Offset = offset
@@ -169,14 +165,14 @@ func (wh *WrapHttpHandlers) UpdateManufacturer(w http.ResponseWriter, r *http.Re
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
 		return
 	}
-	ref := wh.Storage.GetRefManufacturers()
+
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
 
-	m, err := ref.FindById(int64(valId))
+	m, err := wh.Storage.FindManufacturerById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
@@ -189,7 +185,7 @@ func (wh *WrapHttpHandlers) UpdateManufacturer(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	data := new(models.Manufacturer)
+	data := new(whs.Manufacturer)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
@@ -198,7 +194,7 @@ func (wh *WrapHttpHandlers) UpdateManufacturer(w http.ResponseWriter, r *http.Re
 
 	data.Id = m.Id
 
-	resultData, err := ref.Update(data)
+	resultData, err := wh.Storage.UpdateManufacturer(data)
 	if err != nil {
 		if e, ok := err.(*core.WrapError); !ok {
 			fmt.Println(e)
@@ -219,19 +215,19 @@ func (wh *WrapHttpHandlers) DeleteManufacturer(w http.ResponseWriter, r *http.Re
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
 		return
 	}
-	ref := wh.Storage.GetRefManufacturers()
+
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
 
-	m, err := ref.FindById(int64(valId))
+	m, err := wh.Storage.FindManufacturerById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
 	}
-	resultData, err := ref.Delete(m)
+	resultData, err := wh.Storage.DeleteManufacturer(m)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusInternalServerError, fmt.Errorf("item deleting error"))
 		return
@@ -246,8 +242,7 @@ func (wh *WrapHttpHandlers) GetSuggestionManufacturers(w http.ResponseWriter, r 
 		return
 	}
 
-	ref := wh.Storage.GetRefManufacturers()
-	data, err := ref.GetSuggestion(vars["text"], 10)
+	data, err := wh.Storage.GetManufacturersSuggestion(vars["text"], 10)
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))

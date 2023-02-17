@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	app "github.com/mlplabs/app-utils"
 	"github.com/mlplabs/microwms-core/core"
-	"github.com/mlplabs/microwms-core/models"
+	"github.com/mlplabs/microwms-core/whs"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -18,7 +18,7 @@ type GetProductsResponse struct {
 		Offset int `json:"offset"`
 		Count  int `json:"count"`
 	} `json:"header"`
-	Data []models.Product `json:"data"`
+	Data []whs.Product `json:"data"`
 }
 
 func RegisterProductsHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) app.Routes {
@@ -104,15 +104,14 @@ func (wh *WrapHttpHandlers) GetProducts(w http.ResponseWriter, r *http.Request) 
 		limit = 0
 	}
 
-	ref := wh.Storage.GetRefProducts()
-	products, count, err := ref.GetItems(offset, limit, 0)
+	products, count, err := wh.Storage.GetProductsItems(offset, limit, 0)
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 	}
 
 	response := GetProductsResponse{}
-	response.Data = make([]models.Product, 0)
+	response.Data = make([]whs.Product, 0)
 
 	response.Header.Limit = limit
 	response.Header.Offset = offset
@@ -126,8 +125,7 @@ func (wh *WrapHttpHandlers) GetProductsByBarcode(w http.ResponseWriter, r *http.
 	vars := mux.Vars(r)
 	val := vars["barcode"]
 
-	ref := wh.Storage.GetRefProducts()
-	prod, err := ref.FindByBarcode(val)
+	prod, err := wh.Storage.FindProductsByBarcode(val)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
@@ -137,7 +135,7 @@ func (wh *WrapHttpHandlers) GetProductsByBarcode(w http.ResponseWriter, r *http.
 
 func (wh *WrapHttpHandlers) GetProductById(w http.ResponseWriter, r *http.Request) {
 	var err error
-	var prod *models.Product
+	var prod *whs.Product
 	vars := mux.Vars(r)
 
 	if v, ok := vars["id"]; !ok || v == "0" {
@@ -145,13 +143,12 @@ func (wh *WrapHttpHandlers) GetProductById(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	ref := wh.Storage.GetRefProducts()
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
-	prod, err = ref.FindById(int64(valId))
+	prod, err = wh.Storage.FindProductById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
@@ -173,15 +170,14 @@ func (wh *WrapHttpHandlers) GetZonesOfWarehouse(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	refWhs := wh.Storage.GetRefWarehouses()
-	whs, err := refWhs.FindById(int64(valId))
+	whs, err := wh.Storage.FindWhsById(int64(valId))
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 		return
 	}
 
-	whss, err := refWhs.GetZones(whs)
+	whss, err := wh.Storage.GetWhsZones(whs)
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
@@ -198,15 +194,14 @@ func (wh *WrapHttpHandlers) CreateProduct(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	data := new(models.Product)
+	data := new(whs.Product)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
 		return
 	}
 
-	ref := wh.Storage.GetRefProducts()
-	whss, err := ref.Create(data)
+	whss, err := wh.Storage.CreateProduct(data)
 	if err != nil {
 		if err, ok := err.(*core.WrapError); !ok {
 			fmt.Println(err)
@@ -228,14 +223,13 @@ func (wh *WrapHttpHandlers) UpdateProduct(w http.ResponseWriter, r *http.Request
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
 		return
 	}
-	ref := wh.Storage.GetRefProducts()
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
 
-	p, err := ref.FindById(int64(valId))
+	p, err := wh.Storage.FindProductById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
@@ -248,7 +242,7 @@ func (wh *WrapHttpHandlers) UpdateProduct(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	data := new(models.Product)
+	data := new(whs.Product)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
@@ -257,7 +251,7 @@ func (wh *WrapHttpHandlers) UpdateProduct(w http.ResponseWriter, r *http.Request
 
 	data.Id = p.Id
 
-	resultData, err := ref.Update(data)
+	resultData, err := wh.Storage.UpdateProduct(data)
 	if err != nil {
 		if e, ok := err.(*core.WrapError); !ok {
 			fmt.Println(e)
@@ -279,19 +273,18 @@ func (wh *WrapHttpHandlers) DeleteProduct(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	ref := wh.Storage.GetRefProducts()
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
 
-	p, err := ref.FindById(int64(valId))
+	p, err := wh.Storage.FindProductById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
 	}
-	resultData, err := ref.Delete(p)
+	resultData, err := wh.Storage.DeleteProduct(p)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusInternalServerError, fmt.Errorf("item deleting error"))
 		return
@@ -306,8 +299,7 @@ func (wh *WrapHttpHandlers) GetSuggestionProducts(w http.ResponseWriter, r *http
 		return
 	}
 
-	ref := wh.Storage.GetRefProducts()
-	data, err := ref.GetSuggestion(vars["text"], 10)
+	data, err := wh.Storage.GetProductsSuggestion(vars["text"], 10)
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))

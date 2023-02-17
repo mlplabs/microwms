@@ -83,4 +83,26 @@ export default {
             )
         }
     },
+
+    DeleteReceiptDoc(refName, id){
+        return apiClient.delete(`${refName}/${id}`)
+    },
+
+
+    ErrorProcessing(error){
+        console.log(error)
+        if (error.response) {
+            // client received an error response (5xx, 4xx)
+            if (error.response.status === 404){
+                this.statusText = "Ничего не найдено ("
+            }else {
+                this.statusText = "Произошла ошибка ("+error.response.status+")"
+            }
+        } else if (error.request) {
+            // client never received a response, or request never left
+        } else {
+            // anything else
+        }
+
+    }
 }

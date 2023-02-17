@@ -1,7 +1,7 @@
 package routes
 
-import "github.com/mlplabs/microwms-core/models"
+import "github.com/mlplabs/microwms-core/whs"
 
 type WrapHttpHandlers struct {
-	Storage *models.Storage
+	Storage *whs.Storage
 }

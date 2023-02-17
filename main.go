@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	app "github.com/mlplabs/app-utils"
 	"github.com/mlplabs/microwms-core"
-	"github.com/mlplabs/microwms-core/models"
+	"github.com/mlplabs/microwms-core/whs"
 	"github.com/mlplabs/microwms/routes"
 	"net/http"
 	"os"
@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-var Storage *models.Storage
+var Storage *whs.Storage
 
 func main() {
 	app.Log.Init("", "")

@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	app "github.com/mlplabs/app-utils"
 	"github.com/mlplabs/microwms-core/core"
-	"github.com/mlplabs/microwms-core/models"
+	"github.com/mlplabs/microwms-core/whs"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -18,7 +18,7 @@ type GetWhsResponse struct {
 		Offset int `json:"offset"`
 		Count  int `json:"count"`
 	} `json:"header"`
-	Data []models.Whs `json:"data"`
+	Data []whs.Whs `json:"data"`
 }
 
 func RegisterWhsHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) app.Routes {
@@ -80,15 +80,14 @@ func (wh *WrapHttpHandlers) GetWarehouses(w http.ResponseWriter, r *http.Request
 		limit = 0
 	}
 
-	ref := wh.Storage.GetRefWarehouses()
-	mnfs, count, err := ref.GetItems(offset, limit, 0)
+	mnfs, count, err := wh.Storage.GetWhsItems(offset, limit, 0)
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
 	}
 
 	response := GetWhsResponse{}
-	response.Data = make([]models.Whs, 0)
+	response.Data = make([]whs.Whs, 0)
 
 	response.Header.Limit = limit
 	response.Header.Offset = offset
@@ -112,9 +111,7 @@ func (wh *WrapHttpHandlers) GetWarehouse(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	refWhs := wh.Storage.GetRefWarehouses()
-	//whss, err := refWhs.FindById(int64(valId))
-	whss, err := refWhs.GetById(int64(valId))
+	whss, err := wh.Storage.GetWhsById(int64(valId))
 	if err != nil {
 		app.Log.Warning.Printf("data fetch error, %v", err)
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
@@ -132,15 +129,14 @@ func (wh *WrapHttpHandlers) CreateWhs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := new(models.Whs)
+	data := new(whs.Whs)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
 		return
 	}
 
-	ref := wh.Storage.GetRefWarehouses()
-	whss, err := ref.Create(data)
+	whss, err := wh.Storage.CreateWhs(data)
 	if err != nil {
 		if err, ok := err.(*core.WrapError); !ok {
 			fmt.Println(err)
@@ -162,14 +158,13 @@ func (wh *WrapHttpHandlers) UpdateWhs(w http.ResponseWriter, r *http.Request) {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
 		return
 	}
-	ref := wh.Storage.GetRefWarehouses()
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
 
-	m, err := ref.FindById(int64(valId))
+	m, err := wh.Storage.FindWhsById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
@@ -182,7 +177,7 @@ func (wh *WrapHttpHandlers) UpdateWhs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := new(models.Whs)
+	data := new(whs.Whs)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
@@ -191,7 +186,7 @@ func (wh *WrapHttpHandlers) UpdateWhs(w http.ResponseWriter, r *http.Request) {
 
 	data.Id = m.Id
 
-	resultData, err := ref.Update(data)
+	resultData, err := wh.Storage.UpdateWhs(data)
 	if err != nil {
 		if e, ok := err.(*core.WrapError); !ok {
 			fmt.Println(e)
@@ -213,19 +208,18 @@ func (wh *WrapHttpHandlers) DeleteWhs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ref := wh.Storage.GetRefWarehouses()
 	valId, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
 		return
 	}
 
-	m, err := ref.FindById(int64(valId))
+	m, err := wh.Storage.FindWhsById(int64(valId))
 	if err != nil {
 		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
 		return
 	}
-	resultData, err := ref.Delete(m)
+	resultData, err := wh.Storage.DeleteWhs(m)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusInternalServerError, fmt.Errorf("item deleting error"))
 		return

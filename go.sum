@@ -10,9 +10,7 @@ github.com/mikelpsv/go-cups-mod v0.0.0-20230127151145-d676bd33659e h1:i97cJg4r6h
 github.com/mikelpsv/go-cups-mod v0.0.0-20230127151145-d676bd33659e/go.mod h1:T2g0ttsJOlQW8uPSvVFp9buQofTdO7Aq8g1pWxLj5hE=
 github.com/mlplabs/app-utils v0.0.0-20221215103534-d034b483b7e2 h1:9glXyU4fOqGe+ar3I9ak0/PskuPrqYqCxKztj+CBeUo=
 github.com/mlplabs/app-utils v0.0.0-20221215103534-d034b483b7e2/go.mod h1:fA/sXPRsdqpGrIrgbGZo4W1wCn7JAAQrr3KYsOwTeiw=
-github.com/mlplabs/microwms-core v0.0.0-20230213150438-8512b486b7ab h1:jFhzHXy+VEVNI5lDVDSR9BQWgvRo/RjUkGAd6Fxrbeg=
-github.com/mlplabs/microwms-core v0.0.0-20230213150438-8512b486b7ab/go.mod h1:H968aB8ZdZnWOnJh/xCM8/u1/5jccXi9FmdoD3TgrHw=
-github.com/mlplabs/microwms-core v0.0.0-20230214150758-04b66a69e40b h1:GOvWBVYnUYmekkjbZlTbkfTxAiIdqhc9HgRu/cTZK4I=
-github.com/mlplabs/microwms-core v0.0.0-20230214150758-04b66a69e40b/go.mod h1:H968aB8ZdZnWOnJh/xCM8/u1/5jccXi9FmdoD3TgrHw=
+github.com/mlplabs/microwms-core v0.0.0-20230217153045-ff4a7100ed97 h1:E4ILBXpCjWo3+sYIdbnGYRvnRsme3u1MbhF3nY6fFC0=
+github.com/mlplabs/microwms-core v0.0.0-20230217153045-ff4a7100ed97/go.mod h1:H968aB8ZdZnWOnJh/xCM8/u1/5jccXi9FmdoD3TgrHw=
 golang.org/x/crypto v0.5.0 h1:U/0M97KRkSFvyD/3FSmdP5W5swImpNgle/EHFhOsQPE=
 golang.org/x/crypto v0.5.0/go.mod h1:NK/OQwhpMQP3MwtdjgLlYHnH9ebylxKWv3e0fK+mkQU=

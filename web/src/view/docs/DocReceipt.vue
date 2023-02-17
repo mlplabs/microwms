@@ -5,18 +5,22 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">{{ lng.title_form_create }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closeDetailForm"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="onClickFormClose"></button>
           </div>
           <div class="modal-body">
 
             <form class="row g-3">
               <div class="col-md-3">
                 <label for="inputNumber" class="form-label">Номер</label>
-                <input type="text" class="form-control" disabled id="inputNumber" v-model="detailItem.number">
+                <input type="text" class="form-control" id="inputNumber" v-model="detailItem.number" :readonly="!detailItem.isNew">
               </div>
               <div class="col-md-3">
                 <label for="inputDate" class="form-label">Дата</label>
-                <input type="text" class="form-control" id="inputDate" v-model="detailItem.date">
+                <input type="text" class="form-control" id="inputDate" v-model="detailItem.date" :readonly="!detailItem.isNew">
+              </div>
+              <div class="col-md-3">
+                <label for="inputWhs" class="form-label">Склад</label>
+                <input type="text" class="form-control" id="inputWhs" v-model="detailItem.whs" :readonly="!detailItem.isNew">
               </div>
 
               <div class="col-12 table-responsive-xl">
@@ -27,19 +31,21 @@
                   :suggestionData="suggestion"
                   :is-show-paging="false"
                   :is-show-search="false"
-                  @row-clicked="onClickFormRow"
-                  @new-item-clicked="onNewItemForm"
-                  @row-delete="onDeleteFormRow"
-                  @update-suggestion="onUpdateSuggestion"
-                  @select-suggestion="onSelectSuggestion"
+                  @row-clicked="onClickTableRow"
+                  @new-item-clicked="onClickTableNewItem"
+                  @row-delete="onClickTableDelRow"
+                  @update-suggestion="onUpdateSuggestionTable"
+                  @select-suggestion="onSelectSuggestionTable"
                 ></inline-table>
 
               </div>
+
             </form>
+
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="closeDetailForm">{{lng.btn_form_close}}</button>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="storeItem">{{lng.btn_form_store}}</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="onClickFormClose">{{lng.btn_form_close}}</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="onClickFormStore">{{lng.btn_form_store}}</button>
           </div>
         </div>
       </div>
@@ -49,7 +55,7 @@
     <h5>{{lng.title}}</h5>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group me-2">
-        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailForm"  @click="showDetailForm(0) ">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailForm"  @click="showForm(0) ">
           <i class="bi bi-plus"></i>
         </button>
       </div>
@@ -69,8 +75,8 @@
       <tbody>
       <tr v-for="(item, index) in tableData" :key="index">
         <td class="col_id">{{ item.id }}</td>
-        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.number }}</a></td>
-        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.date }}</a></td>
+        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showForm(item.id)">{{ item.number }}</a></td>
+        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showForm(item.id)">{{ item.date }}</a></td>
         <td class="col_action">
           <div class="dropdown">
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
@@ -105,14 +111,29 @@ export default {
       limitRows: 11,
       currentPage: 1,
       detailItem:{
+        isNew: false,
         id: 0,
         number: "",
         date: "08.02.2023",
+        whs: '',
         items: [],
       },
       tableData: [],
       suggestion: [],
-      productColumns: [
+
+
+      lng: {
+        title: "Поступления",
+        title_form_create: "Поступление/Оприходование товара",
+        btn_list_create: "Новый товар",
+        btn_form_close: "Закрыть",
+        btn_form_store: "Сохранить",
+      },
+    }
+  },
+  computed:{
+    productColumns(){
+      return [
         {
           label: "#",
           field: "id",
@@ -144,7 +165,7 @@ export default {
         },
         {
           label: "Ячейка",
-          field: "cell",
+          field: "cell_name",
           isKey: false,
           suggestion: true,
           align: 0
@@ -154,6 +175,7 @@ export default {
           field: "quantity",
           isKey: false,
           isNum: true,
+          readonly: false,
           align: 2
         },
         {
@@ -162,96 +184,79 @@ export default {
           isKey: false,
           align: 1
         }
-      ],
-
-      lng: {
-        title: "Поступления",
-        title_form_create: "Поступление/Оприходование товара",
-        btn_list_create: "Новый товар",
-        btn_form_close: "Закрыть",
-        btn_form_store: "Сохранить",
-      },
-    }
-  },
-
-  methods:{
-    closeDetailForm(){
-
+      ]
     },
-    storeItem(){
-      console.log(this.detailItem)
+  },
+  methods:{
+    /*
+    * List
+    *   DetailForm (Form)
+    *     DetailTable (Table)
+    */
+
+    // DETAIL FORM METHODS
+    onClickFormStore(){
       DataProvider.StoreReceiptDoc("receipt", this.detailItem)
         .then((response) => {
           const storeId = response.data;
           if (storeId > 0) {
-            this.updateItemsOnPage(this.currentPage)
+            this.updateListItems(this.currentPage)
           }
         })
         .catch(error => { this.errorProc(error) });
     },
+    onClickFormClose(){
+
+    },
+    showForm(id){
+      this.resetDetailItem()
+      this.detailItem.isNew = (id === 0)
+
+      for(let i=0; i< this.productColumns.length; i++){
+        if (this.productColumns[i].field === 'product_name' || this.productColumns[i].field === "quantity") {
+          this.productColumns[i].readonly = !this.detailItem.isNew
+        }
+      }
+
+      if (this.detailItem.isNew) {
+        return
+      }
+      this.getDetailItem(id)
+    },
     resetDetailItem(){
       this.detailItem = {
+        isNew: false,
         id: 0,
         number: '',
         date: '',
         items: []
       }
-
     },
 
-    showDetailForm(id){
-      this.resetDetailItem()
-      if (id === 0) {
+    onClickTableNewItem(){
+      let newBc = this.detailItem.items.find(item => item.name === "");
+      if (newBc !== undefined){
         return
       }
-      this.getDetailItem(id)
+      this.detailItem.items.push({id: 0, product_name: "", product_manufacturer: "", product_barcode: "", cell:"", quantity: 0})
     },
-    deleteRow(idx){
+    onClickTableDelRow(idx){
       console.log('delete ' + idx)
-      this.tableData.splice(idx+1, 1)
+      this.detailItem.items.splice(idx, 1)
+    },
+    onClickTableRow(eventData){
+      console.log(eventData)
     },
 
-    getDetailItem(id){
-      DataProvider.GetReceiptDoc("receipt", id)
-        .then((response) => {
-          this.detailItem = response.data
-        })
-        .catch(error => { this.errorProc(error) });
-    },
-    onSelectPage(){
-
-    },
-
-    updateItemsOnPage(page){
-      let offset = ( page -1 ) * this.limitRows
-      DataProvider.GetReceiptDocs("receipt", page, this.limitRows, offset)
-        .then((response) => {
-          console.log(response.data)
-          this.tableData = response.data.data
-          this.countRows = response.data.header.count
-        })
-        .catch(error => { this.errorProc(error) });
-    },
-
-     fillProductRow(row){
-       DataProvider.GetItemReference('products', row.id)
-         .then((response) => {
-           //this.detailItem = response.data
-           console.log(response.data)
-           row.product_manufacturer =response.data.manufacturer.name
-         })
-         .catch(error => { this.errorProc(error) });
-     },
-
-    onSelectSuggestion(emitRow){
+    // Select suggestion from table in detail form
+    onSelectSuggestionTable(emitRow){
       if (emitRow.id !== 0) {
         this.fillProductRow(emitRow)
       }
     },
-
-
-    onUpdateSuggestion(emitData){
-      //console.log('suggestion update for ' + emitData.key + ' ' + emitData.val)
+    // Update suggestions list
+    onUpdateSuggestionTable(emitData){
+      console.log('suggestion update for ' + emitData.key + ' ' + emitData.val)
       if(emitData.key === "product_name"){
         this.updateProductsData(emitData)
       }
@@ -260,56 +265,77 @@ export default {
       }
 
     },
+
+    // LIST ITEMS METHODS
+    // selection page on pagination bar
+    onSelectPage(eventData){
+      this.currentPage = eventData.page
+      this.updateListItems(eventData.page)
+    },
+
+
+
+    // COMMUNICATIONS METHODS
+    // List items update
+    updateListItems(page){
+      let offset = ( page -1 ) * this.limitRows
+      DataProvider.GetReceiptDocs("receipt", page, this.limitRows, offset)
+        .then((response) => {
+          console.log(response.data)
+          this.tableData = response.data.data
+          this.countRows = response.data.header.count
+        })
+        .catch(error => { DataProvider.ErrorProcessing(error) });
+    },
+    // Getting product info
+    getDetailItem(id){
+      DataProvider.GetReceiptDoc("receipt", id)
+        .then((response) => {
+          this.detailItem = response.data
+        })
+        .catch(error => { DataProvider.ErrorProcessing(error) });
+    },
+    // Getting product and // fill row data //
+    fillProductRow(row){
+      DataProvider.GetItemReference('products', row.id)
+        .then((response) => {
+          row.product_manufacturer =response.data.manufacturer.name
+        })
+        .catch(error => { DataProvider.ErrorProcessing(error) });
+    },
+    // Products suggestions
     updateProductsData(emitData){
       DataProvider.GetSuggestionReference('products', emitData.val)
         .then((response) => {
           console.log(response.data)
           this.suggestion = response.data
         })
-        .catch(error => { this.errorProc(error) });
+        .catch(error => { DataProvider.ErrorProcessing(error) });
     },
-
+    // Manufacturers suggestions
     updateManufacturersData(emitData){
       DataProvider.GetSuggestionReference('manufacturers', emitData.val)
         .then((response) => {
           this.suggestion = response.data
         })
-        .catch(error => { this.errorProc(error) });
+        .catch(error => { DataProvider.ErrorProcessing(error) });
     },
-
-    onNewItemForm(){
-      let newBc = this.detailItem.items.find(item => item.name === "");
-      if (newBc !== undefined){
-        return
-      }
-      this.detailItem.items.push({id: 0, product_name: "", product_manufacturer: "", product_barcode: "", cell:"", quantity: 0})
+    deleteItem(id){
+      DataProvider.DeleteReceiptDoc('receipt', id)
+        .then((response) => {
+          const affRows = response.data;
+          if (affRows !== 1){
+            console.log('delete failed')
+          }
+          this.updateListItems(this.currentPage)
+        })
+        .catch(error => { DataProvider.ErrorProcessing(error) });
     },
-    onDeleteFormRow(idx){
-      console.log('delete ' + idx)
-      this.detailItem.items.splice(idx, 1)
-    },
-    onClickFormRow(eventData){
-      console.log(eventData)
-    },
-    errorProc(error){
-      console.log(error)
-      if (error.response) {
-        // client received an error response (5xx, 4xx)
-        if (error.response.status === 404){
-          this.statusText = "Ничего не найдено ("
-        }else {
-          this.statusText = "Произошла ошибка ("+error.response.status+")"
-        }
-      } else if (error.request) {
-        // client never received a response, or request never left
-      } else {
-        // anything else
-      }
-
-    }
+    // OTHER
   },
   mounted() {
-    this.updateItemsOnPage(this.currentPage)
+    this.resetDetailItem()
+    this.updateListItems(this.currentPage)
   }
 }
 </script>

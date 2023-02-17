@@ -75,7 +75,7 @@ export default {
     },
     matches() {
       return this.propSuggestions.filter((str) => {
-        return str.val.indexOf(this.textValue) >= 0;
+        return str.val.toLowerCase().indexOf(this.textValue.toLowerCase()) >= 0;
       });
     },
     openSuggestion() {

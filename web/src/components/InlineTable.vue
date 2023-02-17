@@ -24,20 +24,21 @@
       </thead>
 
       <!-- table body -->
-      <template v-if="rows.length > 0">
+      <template v-if="rows?.length > 0">
         <tbody>
         <tr v-for="(row, j) in rows"  :key="j" @click="$emit('row-clicked', row)">
 
           <!-- set column css class -->
           <td v-for="(col, index) in columns" :key="index" :class="{'col_id': col.isKey, 'col_action': col.field === 'actions', 'text-start': col.align === 0, 'text-center': col.align === 1, 'text-end': col.align === 2 }">
-            <template v-if="row.id === 0 && (col.isKey === false && col.field !== 'actions')">
+
+            <template v-if="(col.isKey === false && col.field !== 'actions')">
 
               <!-- select - if values > 0 -->
               <select class="form-select" v-if="col.values !== undefined && col.values.length > 0">
                 <option v-for="(op, h) in col.values" :key="h" value="{{op.key}}">{{op.val}}</option>
               </select>
 
-              <!-- suggest - if suggestion > 0 -->
+              <!-- suggest - if suggestion == true -->
               <autocomplete-input v-else-if="col.suggestion === true"
                 v-model:prop-selection-id=row[col.field_id]
                 v-model:prop-selection-val=row[col.field]

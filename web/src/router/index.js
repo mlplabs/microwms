@@ -5,12 +5,10 @@ import ReferenceProducts from "@/view/refs/ReferenceProducts";
 import ReferenceManufacturers from "@/view/refs/ReferenceManufacturers";
 import ReferenceWhs from "@/view/refs/ReferenceWhs";
 import ReferenceBarcodes from "@/view/refs/ReferenceBarcodes";
-import ShipmentView from "@/view/ShipmentView";
 import ReportsView from "@/view/ReportsView";
 import PropertiesView from "@/view/PropertiesView";
 import GlobalSearchView from "@/view/GlobalSearchView";
 import DocShipment from "@/view/docs/DocShipment";
-import DocWriteOff from "@/view/docs/DocWriteOff";
 import DocReceipt from "@/view/docs/DocReceipt";
 import HardwarePrinters from "@/view/hardware/preference/HardwarePrinters";
 import ReferenceUsers from "@/view/refs/ReferenceUsers";
@@ -57,11 +55,6 @@ const routes = [
         component: ReferenceUsers
     },
     {
-        path: '/shipment',
-        name: 'ShipmentView',
-        component: ShipmentView
-    },
-    {
         path: '/docs/shipment',
         name: 'DocShipment',
         component: DocShipment
@@ -70,11 +63,6 @@ const routes = [
         path: '/docs/receipt',
         name: 'DocReceipt',
         component: DocReceipt
-    },
-    {
-        path: '/docs/write-off',
-        name: 'DocWriteOff',
-        component: DocWriteOff
     },
     {
         path: '/reports',

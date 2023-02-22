@@ -88,7 +88,6 @@ export default {
         return apiClient.delete(`${refName}/${id}`)
     },
 
-
     ErrorProcessing(error){
         console.log(error)
         if (error.response) {

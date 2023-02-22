@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 )
 
 type GetReceiptDocsResponse struct {
@@ -46,12 +48,14 @@ func (r *ReceiptDoc) ImportData(item *whs.DocItem) {
 
 	for _, v := range item.Items {
 		row := ReceiptDocItem{
-			ProductId:         v.Product.Id,
-			ProductName:       v.Product.Name,
-			ProductItemNumber: v.Product.ItemNumber,
-			CellId:            v.CellDst.Id,
-			CellName:          v.CellDst.Name,
-			Quantity:          v.Quantity,
+			ProductId:             v.Product.Id,
+			ProductName:           v.Product.Name,
+			ProductItemNumber:     v.Product.ItemNumber,
+			ProductManufacturer:   v.Product.Manufacturer.Name,
+			ProductManufacturerId: v.Product.Manufacturer.Id,
+			CellId:                v.CellDst.Id,
+			CellName:              v.CellDst.Name,
+			Quantity:              v.Quantity,
 		}
 		r.Items = append(r.Items, row)
 	}
@@ -61,8 +65,10 @@ func (r *ReceiptDoc) ExportData() *whs.DocItem {
 	docItem := whs.DocItem{
 		Id:      int64(r.Id),
 		Number:  r.Number,
-		Date:    r.Date,
 		DocType: 1,
+	}
+	if strings.Trim(r.Date, " ") == "" {
+		docItem.Date = time.Now().Format("2006-01-02")
 	}
 	for _, v := range r.Items {
 		docItem.Items = append(docItem.Items, whs.DocRow{
@@ -74,14 +80,14 @@ func (r *ReceiptDoc) ExportData() *whs.DocItem {
 				},
 				ItemNumber: v.ProductItemNumber,
 				Barcodes:   nil,
-				Manufacturer: whs.Manufacturer{
+				Manufacturer: &whs.Manufacturer{
 					RefItem: whs.RefItem(struct {
 						Id       int64
 						ParentId int64
 						Name     string
 					}{Id: v.ProductManufacturerId, ParentId: 0, Name: v.ProductManufacturer}),
 				},
-				Size: whs.SpecificSize{},
+				Size: &whs.SpecificSize{},
 			},
 			CellDst: whs.Cell{
 				Id:   v.CellId,

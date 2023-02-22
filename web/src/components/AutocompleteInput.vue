@@ -1,6 +1,6 @@
 <template>
   <div>
-  <input class="form-control" type="text" v-model="textValue"
+  <input class="form-control" type="text" v-model="textValue" :readonly="propReadonly"
          @keydown.enter = 'onEnter'
          @keydown.down = 'onKeyDown'
          @keydown.up = 'onKeyUp'
@@ -53,6 +53,9 @@ export default {
     },
     propKey:{
       type: String
+    },
+    propReadonly:{
+      type: Boolean
     }
 
   },
@@ -74,9 +77,11 @@ export default {
       }
     },
     matches() {
-      return this.propSuggestions.filter((str) => {
-        return str.val.toLowerCase().indexOf(this.textValue.toLowerCase()) >= 0;
-      });
+      return this.propSuggestions
+      // for local search
+      //return this.propSuggestions.filter((str) => {
+      //  return str.val.indexOf(this.textValue) >= 0;
+      //});
     },
     openSuggestion() {
       return this.textValue !== "" &&

@@ -67,6 +67,7 @@
       <thead>
       <tr>
         <th scope="col" class="col_head col_id">#</th>
+        <th scope="col" class="col_head">Тип</th>
         <th scope="col" class="col_head">Номер</th>
         <th scope="col" class="col_head">Дата</th>
         <th scope="col" class="col_head col_action">...</th>
@@ -75,6 +76,7 @@
       <tbody>
       <tr v-for="(item, index) in tableData" :key="index">
         <td class="col_id">{{ item.id }}</td>
+        <td><span>{{ this.getDocType(item.doc_type) }}</span></td>
         <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showForm(item.id)">{{ item.number }}</a></td>
         <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showForm(item.id)">{{ item.date }}</a></td>
         <td class="col_action">
@@ -136,7 +138,7 @@ export default {
       return [
         {
           label: "#",
-          field: "id",
+          field: "product_id",
           isKey: true,
           isNum: true,
           align: 2
@@ -186,6 +188,7 @@ export default {
         }
       ]
     },
+
   },
   methods:{
     /*
@@ -213,7 +216,9 @@ export default {
       this.detailItem.isNew = (id === 0)
 
       for(let i=0; i< this.productColumns.length; i++){
-        if (this.productColumns[i].field === 'product_name' || this.productColumns[i].field === "quantity") {
+        if (this.productColumns[i].field === 'product_name'
+          || this.productColumns[i].field === 'product_manufacturer'
+          || this.productColumns[i].field === "quantity") {
           this.productColumns[i].readonly = !this.detailItem.isNew
         }
       }
@@ -259,11 +264,13 @@ export default {
       console.log('suggestion update for ' + emitData.key + ' ' + emitData.val)
       if(emitData.key === "product_name"){
         this.updateProductsData(emitData)
+        return
       }
       if(emitData.key === "product_manufacturer"){
         this.updateManufacturersData(emitData)
+        return
       }
-
+      this.suggestion = []
     },
 
     // LIST ITEMS METHODS
@@ -272,8 +279,14 @@ export default {
       this.currentPage = eventData.page
       this.updateListItems(eventData.page)
     },
-
-
+    getDocType(doc_type){
+      if(doc_type === 1){
+        return "Поступление"
+      }
+      if(doc_type === 2){
+        return "Оприходование"
+      }
+    },
 
     // COMMUNICATIONS METHODS
     // List items update
@@ -307,7 +320,7 @@ export default {
     updateProductsData(emitData){
       DataProvider.GetSuggestionReference('products', emitData.val)
         .then((response) => {
-          console.log(response.data)
+          console.log('updateProductsData: ' + response.data)
           this.suggestion = response.data
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
@@ -316,6 +329,7 @@ export default {
     updateManufacturersData(emitData){
       DataProvider.GetSuggestionReference('manufacturers', emitData.val)
         .then((response) => {
+          console.log('updateManufacturersData: ' + response.data)
           this.suggestion = response.data
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
@@ -334,7 +348,6 @@ export default {
     // OTHER
   },
   mounted() {
-    this.resetDetailItem()
     this.updateListItems(this.currentPage)
   }
 }

@@ -44,16 +44,17 @@
                 v-model:prop-selection-val=row[col.field]
                 v-model:prop-suggestions="suggestionValue"
                 v-model:prop-key="col.field"
+                v-model:prop-readonly="col.readonly"
                 @onUpdateData="$emit('update-suggestion', $event)"
                 @onSelectData="$emit('select-suggestion', row, $event)"
               >
               </autocomplete-input>
 
               <!-- input integer if isNum is true -->
-              <input v-else-if="col.isNum" class="form-control text-end" type="number" v-model.number="row[col.field]" />
-
+              <input v-else-if="col.isNum" class="form-control text-end" type="number" v-model.number="row[col.field]" :readonly="col.readonly"/>
               <!--  input text -->
-              <input v-else class="form-control" type="text" v-model="row[col.field]" />
+              <input v-else class="form-control" type="text" v-model="row[col.field]" :readonly="col.readonly"/>
+
             </template>
 
             <template v-else-if="col.field === 'actions'">

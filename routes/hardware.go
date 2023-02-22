@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"fmt"
-	cups "github.com/mikelpsv/go-cups-mod"
 	app "github.com/mlplabs/app-utils"
 	"net/http"
 )
@@ -26,21 +24,21 @@ func RegisterHardwareHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers
 }
 
 func (wh *WrapHttpHandlers) GetPrinters(w http.ResponseWriter, r *http.Request) {
-	resPrinters := make([]Printer, 0)
-	printers := cups.NewConnection()
-	n, err := printers.EnumDestinations()
-	if err != nil {
-		fmt.Printf("%v", err.Error())
-		return
-	}
-	fmt.Printf("found %d\n", n)
-
-	for _, dest := range printers.Dests {
-		p := Printer{}
-		p.Name = dest.Name
-		p.Instance = dest.Instance
-		p.Status = dest.Status()
-		resPrinters = append(resPrinters, p)
-	}
-	app.ResponseJSON(w, http.StatusOK, resPrinters)
+	//resPrinters := make([]Printer, 0)
+	//printers := cups.NewConnection()
+	//n, err := printers.EnumDestinations()
+	//if err != nil {
+	//	fmt.Printf("%v", err.Error())
+	//	return
+	//}
+	//fmt.Printf("found %d\n", n)
+	//
+	//for _, dest := range printers.Dests {
+	//	p := Printer{}
+	//	p.Name = dest.Name
+	//	p.Instance = dest.Instance
+	//	p.Status = dest.Status()
+	//	resPrinters = append(resPrinters, p)
+	//}
+	//app.ResponseJSON(w, http.StatusOK, resPrinters)
 }

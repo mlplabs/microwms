@@ -12,6 +12,6 @@ require (
 require (
 	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/lib/pq v1.10.7 // indirect
-	github.com/mlplabs/microwms-core v0.0.0-20230217153045-ff4a7100ed97 // indirect
+	github.com/mlplabs/microwms-core v0.0.0-20230221064939-0ea210e33ae1 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
 )

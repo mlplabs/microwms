@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:7123/', //api/v1.0/
+    baseURL: 'http://microwms.ru:7123/', //api/v1.0/
     withCredentials: false,
     headers: {
         'Accept': 'application/json',

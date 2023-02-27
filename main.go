@@ -45,7 +45,7 @@ func main() {
 func StartHttpServer(router *mux.Router) {
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf("%s:%d", conf.Cfg.AppAddr, conf.Cfg.AppPort),
+		Addr:    fmt.Sprintf("%s:%s", conf.Cfg.AppAddr, conf.Cfg.AppPort),
 		Handler: router,
 	}
 

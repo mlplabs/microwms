@@ -1,6 +1,7 @@
 .idea
 .data
 .env
+.env.production*
 !.env.sample
 
 

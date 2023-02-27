@@ -11,15 +11,12 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Set up Go
+    - name: set up golang
       uses: actions/setup-go@v3
       with:
         go-version: 1.18
 
-# - name: Test
-#   run: go test -v ./...
-
-    - name: build
+    - name: build_back
       run: |
         sudo apt-get install -y libcups2-dev
         mkdir builds && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -race -ldflags "-extldflags '-static'" -o build/mwms
@@ -53,7 +50,7 @@ jobs:
       HOSTNAME: ${{secrets.HOSTNAME}}
 
     steps:
-      - uses: actions/checkout@v3
+      #- uses: actions/checkout@v3
 
       - name: upload artifact
         uses: actions/download-artifact@v3

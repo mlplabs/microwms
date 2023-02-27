@@ -80,14 +80,14 @@ func (r *ReceiptDoc) ExportData() *whs.DocItem {
 				},
 				ItemNumber: v.ProductItemNumber,
 				Barcodes:   nil,
-				Manufacturer: &whs.Manufacturer{
+				Manufacturer: whs.Manufacturer{
 					RefItem: whs.RefItem(struct {
 						Id       int64
 						ParentId int64
 						Name     string
 					}{Id: v.ProductManufacturerId, ParentId: 0, Name: v.ProductManufacturer}),
 				},
-				Size: &whs.SpecificSize{},
+				Size: whs.SpecificSize{},
 			},
 			CellDst: whs.Cell{
 				Id:   v.CellId,

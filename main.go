@@ -7,6 +7,7 @@ import (
 	app "github.com/mlplabs/app-utils"
 	"github.com/mlplabs/microwms-core"
 	"github.com/mlplabs/microwms-core/whs"
+	"github.com/mlplabs/microwms/conf"
 	"github.com/mlplabs/microwms/routes"
 	"net/http"
 	"os"
@@ -19,11 +20,15 @@ var Storage *whs.Storage
 
 func main() {
 	app.Log.Init("", "")
+
+	conf.ReadEnv()
+
 	Storage = microwms_core.GetStorage()
 
 	wHandlers := new(routes.WrapHttpHandlers)
 	wHandlers.Storage = Storage
-	err := wHandlers.Storage.Init("localhost", "wmsdb", "devuser", "devuser")
+
+	err := wHandlers.Storage.Init(conf.Cfg.DbHost, conf.Cfg.DbName, conf.Cfg.DbUser, conf.Cfg.DbPassword)
 
 	if err != nil {
 		app.Log.Error.Fatalf("storage initialization failed, %v", err)

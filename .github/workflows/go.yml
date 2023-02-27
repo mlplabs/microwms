@@ -19,7 +19,7 @@ jobs:
     - name: build_back
       run: |
         sudo apt-get install -y libcups2-dev
-        mkdir builds && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -race -ldflags "-extldflags '-static'" -o build/mwms
+        mkdir builds && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -race -ldflags "-extldflags '-static'" -o build/mwms-daemon
       
     - name: build_front
       run: |
@@ -27,7 +27,7 @@ jobs:
         npm install npm@6.14.17
         npm run build --if-present
       
-    - name: store artifact
+    - name: store artifact back
       uses: actions/upload-artifact@v3
       with:
         name: build_data
@@ -38,6 +38,12 @@ jobs:
       with:
         name: build_front_data
         path: web/dist/        
+
+    - name: store artifact scripts
+      uses: actions/upload-artifact@v3
+      with:
+        name: install scripts
+        path: scripts/
 
   deploy:
     needs: [build]
@@ -50,9 +56,7 @@ jobs:
       HOSTNAME: ${{secrets.HOSTNAME}}
 
     steps:
-      #- uses: actions/checkout@v3
-
-      - name: upload artifact
+      - name: upload artifact back
         uses: actions/download-artifact@v3
         with:
           name: build_data
@@ -63,8 +67,14 @@ jobs:
         with:
           name: build_front_data
           path: web/dist/
-          
-      - name: Prepare key
+
+      - name: upload artifact scripts
+        uses: actions/download-artifact@v3
+        with:
+          name: install scripts
+          path: scripts/
+
+      - name: prepare and upload
         run: |
           set -eu
           mkdir "$HOME/.ssh"
@@ -72,3 +82,5 @@ jobs:
           chmod 600 "$HOME/.ssh/key"
           rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . $HOSTNAME:/home/mike/deploy_mwms
           ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no $HOSTNAME chmod +x deploy_mwms/build/mwms
+
+      - name: install

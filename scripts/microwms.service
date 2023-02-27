@@ -1,0 +1,23 @@
+[Unit]
+Description=MicroWms service
+After=syslog.target
+After=network.target
+After=nginx.service
+[Service]
+Type=simple
+
+ExecStart=/opt/microwms/mwms-daemon
+WorkingDirectory=/opt/microwms
+Restart=always
+RestartSec=20
+
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p /var/log/microwms
+ExecStartPre=/bin/chown syslog:adm /var/log/microwms
+ExecStartPre=/bin/chmod 755 /var/log/microwms
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=mwms-daemon
+
+[Install]
+WantedBy=multi-user.target

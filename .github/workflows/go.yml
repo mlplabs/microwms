@@ -82,5 +82,5 @@ jobs:
           chmod 600 "$HOME/.ssh/key"
           rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . $HOSTNAME:/home/mike/deploy_mwms
           ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no $HOSTNAME chmod +x deploy_mwms/build/mwms-daemon
-          ssh $HOSTNAME chmod +x deploy_mwms/scripts/install.sh 
-          ssh $HOSTNAME sudo ./deploy_mwms/scripts/install.sh
+          ssh -i $HOME/.ssh/key $HOSTNAME chmod +x deploy_mwms/scripts/install.sh 
+          ssh -i $HOME/.ssh/key $HOSTNAME sudo ./deploy_mwms/scripts/install.sh

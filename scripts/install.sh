@@ -3,7 +3,7 @@
 BASE_DIR=/opt/microwms
 DEPLOY_DIR=/home/mike/deploy_mwms
 
-chmod +x $BASE_DIR/mwms-daemon
+
 
 if [ -d $BASE_DIR ]; then
   echo "Stopped service..."
@@ -12,6 +12,7 @@ if [ -d $BASE_DIR ]; then
   echo "Copyng microwms files..."
   mv $BASE_DIR/mwms-daemon $BASE_DIR/mwms-daemon.bak
   cp $DEPLOY_DIR/build/mwms-daemon $BASE_DIR/mwms-daemon
+  chmod +x $BASE_DIR/mwms-daemon
 #  mv $BASE_DIR/.env $BASE_DIR/.env.bak
 #  cp $DEPLOY_DIR/build/.env $BASE_DIR/.env
   echo "Starting service..."
@@ -21,6 +22,7 @@ else
   mkdir -p $BASE_DIR
   echo "Copyng microwms files..."
   cp $DEPLOY_DIR/build/mwms-daemon $BASE_DIR/mwms-daemon
+  chmod +x $BASE_DIR/mwms-daemon
 #  cp $DEPLOY_DIR/build/.env $BASE_DIR/.env
   echo "Registering and starting service"
   cp $DEPLOY_DIR/scripts/microwms.service /etc/systemd/system/microwms.service

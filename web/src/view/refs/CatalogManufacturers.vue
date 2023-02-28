@@ -83,7 +83,7 @@ import PaginationBar from "@/components/PaginationBar";
 import AutocompleteInput from "@/components/AutocompleteInput";
 
 export default {
-  name: "ReferenceManufacturers",
+  name: "CatalogManufacturers",
   components: {AutocompleteInput, PaginationBar},
 
   data(){

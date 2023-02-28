@@ -23,8 +23,11 @@
             <a class="nav-link dropdown-toggle" href="#" id="dropdown05" data-bs-toggle="dropdown" aria-expanded="false">{{ lng.label_navigation }}</a>
             <ul class="dropdown-menu" aria-labelledby="dropdown05">
               <li><router-link to="/refs" class="dropdown-item">Справочники</router-link></li>
-              <li><router-link to="/shipment" class="dropdown-item">Отгрузки</router-link></li>
               <li><router-link to="/docs/receipt" class="dropdown-item">Поступления</router-link></li>
+              <li><router-link to="/shipment" class="dropdown-item">Отгрузки</router-link></li>
+              <li class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Остатки товаров</a></li>
+              <li><a class="dropdown-item" href="#">Карточка товара</a></li>
               <li class="dropdown-divider"></li>
               <li><router-link to="/props" class="dropdown-item">Настройки</router-link></li>
               <!--

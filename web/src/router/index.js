@@ -1,17 +1,17 @@
 import { createRouter, createWebHashHistory } from 'vue-router' //
 import MainView from "@/view/MainView";
 import ReferencesView from "@/view/ReferencesView";
-import ReferenceProducts from "@/view/refs/ReferenceProducts";
-import ReferenceManufacturers from "@/view/refs/ReferenceManufacturers";
-import ReferenceWhs from "@/view/refs/ReferenceWhs";
-import ReferenceBarcodes from "@/view/refs/ReferenceBarcodes";
+import CatalogProducts from "@/view/refs/CatalogProducts";
+import CatalogManufacturers from "@/view/refs/CatalogManufacturers";
+import ReferenceWhs from "@/view/refs/CatalogWhs";
+import CatalogBarcodes from "@/view/refs/CatalogBarcodes";
 import ReportsView from "@/view/ReportsView";
 import PropertiesView from "@/view/PropertiesView";
 import GlobalSearchView from "@/view/GlobalSearchView";
 import DocShipment from "@/view/docs/DocShipment";
 import DocReceipt from "@/view/docs/DocReceipt";
 import HardwarePrinters from "@/view/hardware/preference/HardwarePrinters";
-import ReferenceUsers from "@/view/refs/ReferenceUsers";
+import CatalogUsers from "@/view/refs/CatalogUsers";
 
 const routes = [
     {
@@ -31,13 +31,13 @@ const routes = [
     },
     {
         path: '/refs/products',
-        name: 'ReferenceProducts',
-        component: ReferenceProducts
+        name: 'CatalogProducts',
+        component: CatalogProducts
     },
     {
         path: '/refs/manufacturers',
-        name: 'ReferenceManufacturers',
-        component: ReferenceManufacturers
+        name: 'CatalogManufacturers',
+        component: CatalogManufacturers
     },
     {
         path: '/refs/whs',
@@ -46,13 +46,13 @@ const routes = [
     },
     {
         path: '/refs/barcodes',
-        name: 'ReferenceBarcodes',
-        component: ReferenceBarcodes
+        name: 'CatalogBarcodes',
+        component: CatalogBarcodes
     },
     {
         path: '/refs/users',
-        name: 'ReferenceUsers',
-        component: ReferenceUsers
+        name: 'CatalogUsers',
+        component: CatalogUsers
     },
     {
         path: '/docs/shipment',

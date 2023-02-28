@@ -5,61 +5,56 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 v-if="detailItem.isNew" class="modal-title">{{lng.title_form_create}}</h5>
-            <h5 v-else class="modal-title">{{lng.title_form_edit}}</h5>
+            <h5 v-else class="modal-title">{{ lng.title_form_edit }}</h5>
 
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closeDetailForm"></button>
           </div>
           <div class="modal-body">
-
             <form>
+              <input type="hidden" value="{{detailItem.id}}" >
               <div class="mb-3">
-                <label for="inputMnf" class="form-label">Наименование</label>
+                <label for="inputName" class="form-label">Наименование</label>
                 <autocomplete-input
-                  v-model:prop-suggestions="whsSuggestion"
+                  v-model:prop-suggestions="productsSuggestion"
                   v-model:prop-selection-id="detailItem.id"
                   v-model:prop-selection-val="detailItem.name"
-                  @onUpdateData="updateManufacturersData">
+                  @onUpdateData="updateProductsData">
                 </autocomplete-input>
-              </div>
-              <div class="mb-3">
-                <label for="inputAddr" class="form-label">Адрес</label>
-                <input id="inputAddr" class="form-control" type="text" v-model="detailItem.address"/>
-              </div>
-              <div class="mb-3">
-              </div>
-              <div class="mb-3">
-              </div>
 
-              <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-accept" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Приемка</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-storage" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Хранение</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-ship" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Отгрузка</button>
-                </li>
-              </ul>
-              <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active pt-2" id="home-tab-accept" role="tabpanel" aria-labelledby="" tabindex="0">
-                    <label for="inputZoneIn" class="form-label">Зона приемки</label>
-                    <input id="inputZoneIn" class="form-control" disabled type="text" v-model="detailItem.acceptance_zone.name"/>
+                <!-- div id="nameHelp" class="form-text">We'll never share your email with anyone else.</div-->
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-8">
+                  <label for="inputMnf" class="form-label">Производитель</label>
+                  <autocomplete-input
+                    v-model:prop-suggestions="manufacturersSuggestion"
+                    v-model:prop-selection-id="detailItem.manufacturer.id"
+                    v-model:prop-selection-val="detailItem.manufacturer.name"
+                    @onUpdateData="updateManufacturersData">
+                  </autocomplete-input>
                 </div>
-                <div class="tab-pane fade pt-2" id="profile-tab-storage" role="tabpanel" aria-labelledby="" tabindex="0">
-                  <label for="inputZoneOut" class="form-label">Зона хранения</label>
-                  <input id="inputZoneOut" class="form-control" disabled type="text" />
+
+                <div class="col-md-4">
+                  <label for="inputItemNumber" class="form-label">Артикул</label>
+                  <input type="text" class="form-control" id="inputItemNumber" v-model="detailItem.item_number">
                 </div>
-                <div class="tab-pane fade pt-2" id="contact-tab-ship" role="tabpanel" aria-labelledby="" tabindex="0">
-                  <label for="inputZoneStore" class="form-label">Зона отгрузки</label>
-                  <input id="inputZoneStore" class="form-control" disabled type="text" v-model="detailItem.shipping_zone.name" /> <!-- v-model="detailItem.storage_zones[0].name" -->
-                </div>
+              </div>
+              <div class="mb-3">
+                <inline-table
+                  :is-show-paging="false"
+                  :is-show-search="false"
+                  :rows="detailItem.barcodes"
+                  :columns="barcodesColumns"
+                  @new-item-clicked="onNewItem"
+                  @row-delete="onDeleteItem">
+                </inline-table>
+
               </div>
             </form>
 
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="closeDetailForm">{{lng.btn_form_close}}</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="closeDetailForm">{{ lng.btn_form_close }}</button>
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="storeItem">{{ lng.btn_form_store }}</button>
           </div>
         </div>
@@ -80,23 +75,28 @@
 
   <div class="table-responsive">
     <table class="table table-striped table-hover table-bordered">
-      <thead>
+      <thead> <!-- class="table-dark" -->
       <tr>
         <th scope="col" class="col_head col_id">#</th>
         <th scope="col" class="col_head">Наименование</th>
+        <th scope="col" class="col_head">Артикул</th>
+        <th scope="col" class="col_head">Производитель</th>
         <th scope="col" class="col_head col_action">...</th>
       </tr>
       </thead>
       <tbody>
       <tr v-for="(item, index) in tableData" :key="index">
         <td class="col_id">{{ item.id }}</td>
-        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.name }}</a></td>
+        <td><a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.name }}</a></td>
+        <td>{{ item.item_number }}</td>
+        <td>{{ item.manufacturer.name }}</td>
         <td class="col_action">
           <div class="dropdown">
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
               <i class="bi bi-three-dots-vertical"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" @click.prevent="printLabel(item.id)">Печать этикетки {{item.name}}</a></li>
               <li><a class="dropdown-item" href="#" @click.prevent="deleteItem(item.id)">Удалить {{item.name}}</a></li>
               <!--li><a class="dropdown-item" href="#">Another action {{item.id}}</a></li>
               <li><a class="dropdown-item" href="#">Something else here</a></li-->
@@ -114,61 +114,68 @@
 import DataProvider from "@/services/DataProvider";
 import PaginationBar from "@/components/PaginationBar";
 import AutocompleteInput from "@/components/AutocompleteInput";
+import InlineTable from "@/components/InlineTable";
 
 export default {
-  name: "ReferenceWhs",
-  components: {AutocompleteInput, PaginationBar},
+  name: "CatalogProducts",
+  components: {AutocompleteInput, PaginationBar, InlineTable},
 
   data(){
     return {
-      refName: 'warehouses',
+      refName: 'products',
       tableData: [],
       countRows: 0,
-      limitRows: 7,
+      limitRows: 11,
       currentPage: 1,
       detailItem: {
         isNew: false,
         id: 0,
         name: "",
-        address: "",
-        acceptance_zone: {
+        item_number: "",
+        manufacturer:{
           id: 0,
-          name: "",
+          name: ''
         },
-        shipping_zone: {
-          id: 0,
-          name: "",
-        },
-        storage_zones: [
-          {
-            id: 0,
-            name: "",
-          }
-        ],
+        barcodes:[]
       },
-      whsSuggestion: [],
-      columns: [
+      barcodesColumns:[
         {
           label: "#",
           field: "id",
           isKey: true,
+          align: 2
         },
         {
-          label: "Наименование",
+          label: "Штрих-код",
           field: "name",
           isKey: false,
+          align: 0
         },
         {
-          label: "Действия",
+          label: "Тип",
+          field: "type",
+          isKey: false,
+          align: 0,
+          values:[
+            {key: 1, val: 'Ean 13'},
+            {key: 2, val: 'Ean 14'},
+            {key: 3, val: 'Ean 8'}
+          ]
+        },
+        {
+          label: "...",
           field: "actions",
           isKey: false,
-        }
+          align: 1
+        },
       ],
+      productsSuggestion: [],
+      manufacturersSuggestion: [],
       lng: {
-        title: "Склады",
-        title_form_create: "Создание склада",
-        title_form_edit: "Редактирование склада",
-        btn_list_create: "Новый склад",
+        title: "Товары",
+        title_form_create: "Создание товара",
+        title_form_edit: "Редактирование товара",
+        btn_list_create: "Новый товар",
         btn_form_close: "Закрыть",
         btn_form_store: "Сохранить",
       },
@@ -176,6 +183,20 @@ export default {
   },
 
   methods:{
+    onNewItem(){
+      let newBc = this.detailItem.barcodes.find(item => item.id === 0);
+      if (newBc !== undefined){
+        return
+      }
+      this.detailItem.barcodes.push({id: 0, name:'', type: 0})
+    },
+    onDeleteItem(emitData){
+      console.log(emitData)
+      let idx = this.detailItem.barcodes.findIndex(item => item.id === emitData.id);
+      this.detailItem.barcodes.splice(idx, 1)
+    },
+
+    // Открываем форму нового или существующего
     showDetailForm(id){
       this.resetDetailItem()
       this.detailItem.isNew = (id === 0)
@@ -192,12 +213,12 @@ export default {
       this.detailItem = {
         id: 0,
         name: '',
-        address: '',
-        acceptance_zone: {id: 0, name: ''},
-        shipping_zone:  {id: 0, name: ''},
-        storage_zones: [ {id: 0, name: ''} ]
+        item_number: '',
+        manufacturer: {id: 0, name: ''},
+        barcodes: [],
       }
-      this.whsSuggestion = []
+      this.productsSuggestion = []
+      this.manufacturersSuggestion = []
     },
 
     onSelectPage(eventData){
@@ -237,17 +258,31 @@ export default {
     deleteItem(id){
       DataProvider.DeleteItemReference(this.refName, id)
         .then((response) => {
-          const affRows = response.data;
-          if (affRows !== 1){
-            console.log('delete failed')
-          }
-          this.updateItemsOnPage(this.currentPage)
+            const affRows = response.data;
+            if (affRows !== 1){
+              console.log('delete failed')
+            }
+            this.updateItemsOnPage(this.currentPage)
+        })
+        .catch(error => { this.errorProc(error) });
+    },
+    printLabel(id){
+      DataProvider.PrintItemReference(this.refName, id)
+        .then((response) => {
+          console.log(response)
+        })
+        .catch(error => { this.errorProc(error) });
+    },
+    updateProductsData(emitData){
+      DataProvider.GetSuggestionReference(this.refName, emitData.val)
+        .then((response) => {
+          this.productsSuggestion = response.data
         })
         .catch(error => { this.errorProc(error) });
     },
 
     updateManufacturersData(emitData){
-      DataProvider.GetSuggestionReference(this.refName, emitData.val)
+      DataProvider.GetSuggestionReference('manufacturers', emitData.val)
         .then((response) => {
           this.manufacturersSuggestion = response.data
         })
@@ -273,6 +308,7 @@ export default {
     }
   },
   mounted() {
+    console.log(process.env.NODE_ENV);
     this.updateItemsOnPage(this.currentPage)
   }
 }

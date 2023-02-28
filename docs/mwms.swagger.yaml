@@ -330,17 +330,16 @@ paths:
                 type: integer                  
         404:
           description: производитель не найден
-
-  /suggestion/{reference_name}/{text}:          
+  /suggestion/{catalog_name}/{text}:
     get:
       tags:
         - "Общие методы"
-      summary: 'gets suggestions from the given reference'
+      summary: 'gets suggestions from the given catalog'
       parameters:
-        - name: reference_name
+        - name: catalog_name
           in: path
           required: true
-          description: 'reference name'
+          description: 'catalog name'
           schema:
             type: string
         - name: text
@@ -377,9 +376,9 @@ components:
           description: актуальная версия, рекомендуемая к использованию
           example: "v1.1"
 
-    RefListHeader:
+    ListHeader:
       type: object
-      description: 'common reference list header'
+      description: 'common list header'
       properties:
         limit:
           type: integer
@@ -412,7 +411,7 @@ components:
       description: 'warehouse list'
       properties:
         header:
-          $ref: '#/components/schemas/RefListHeader'
+          $ref: '#/components/schemas/ListHeader'
         data:
           type: array
           items:
@@ -480,7 +479,7 @@ components:
       type: object
       properties:
         header: 
-          $ref: '#/components/schemas/RefListHeader'
+          $ref: '#/components/schemas/ListHeader'
         data:
           type: array
           items:

@@ -18,6 +18,8 @@ The source code is in the [/web](https://github.com/mlplabs/microwms/tree/master
 
 Golang 1.18
 
+API documentation (in progress) [swagger](https://mlplabs.github.io/microwms/api)
+
 #### Database
 
 Postgresql 12 and above

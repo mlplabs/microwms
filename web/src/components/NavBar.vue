@@ -1,7 +1,7 @@
 <template>
   <header class="navbar navbar-expand-lg" aria-label="Fifth navbar example navbar-dark bg-dark">
     <div class="container-fluid">
-      <a class="navbar-brand fw-bold fs-4" href="#">MicroWMS</a>
+      <a class="navbar-brand fw-bold fs-4" href="#"><img src="assets/logo1.png" style="width: 46px; right: 46px; margin-right: 3px;">MicroWMS</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsToggler" aria-controls="" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>

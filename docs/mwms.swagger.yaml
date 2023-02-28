@@ -122,8 +122,6 @@ paths:
               schema:
                 type: integer
                 description: 'the number of items removed. the count can be 0 if the database architecture does not allow data integrity to be compromised'
-
-
   /products:
     get:
       tags:
@@ -237,7 +235,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductListItem'   
-
   /manufacturers:
     get:
       tags:
@@ -290,7 +287,6 @@ paths:
                 example: 3
         400:
           description: 'invalid input data' 
-  
   /manufacturers/{id}:
     get:
       tags:
@@ -334,9 +330,35 @@ paths:
                 type: integer                  
         404:
           description: производитель не найден
-          
-               
 
+  /suggestion/{reference_name}/{text}:          
+    get:
+      tags:
+        - "Общие методы"
+      summary: 'gets suggestions from the given reference'
+      parameters:
+        - name: reference_name
+          in: path
+          required: true
+          description: 'reference name'
+          schema:
+            type: string
+        - name: text
+          in: path
+          required: true
+          description: 'search text'
+          schema:
+            type: string 
+            
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SuggestionItem'   
 
 components:
   schemas:
@@ -526,6 +548,22 @@ components:
           type: integer
           description: 'barcode type'
           example: 1
+     
+    # suggestion
+    SuggestionItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 'suggestion key'
+          example: 4
+        val:
+          type: string
+          description: 'suggestion value'
+        title:
+          type: string
+          description: 'suggestion title'
+    
       
   securitySchemes:
       ApiKeyAuth:        

@@ -7,8 +7,8 @@ security:
   - ApiKeyAuth: []
   
 servers:
-  - url: microwms.ru/api/v1.0
-    description: ""
+  - url: http://microwms.ru/api/v1.0
+    description: "production"
     
 tags:
 - name: "Общие методы"

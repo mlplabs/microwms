@@ -1,17 +1,18 @@
 openapi: 3.0.0
 info:
-  title: "microWMS service"
+  title: "MicroWMS service"
   description:  ""
-  version: "1.0"
+  version: "1.1"
 security:
   - ApiKeyAuth: []
   
 servers:
-  - url: http://microwms.ru/api/v1.0
-    description: "production"
+  - url: microwms.ru/api/v1.0
+    description: ""
     
 tags:
 - name: "Общие методы"
+- name: "Склады"
 - name: "Товары"
 - name: "Производители"
 - name: "Штрих-коды"
@@ -30,22 +31,115 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ping'
 
-  /refs/products/:
+  /warehouses:
     get:
       tags:
-        - "Товары"
-      summary: получение списка товаров
+        - "Склады"
+      summary: 'gets a list of warehouses'
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProfuctsResponse'   
+                $ref: '#/components/schemas/WarehouseList' 
+    post:
+      tags:
+        - "Склады"
+      summary: 'creates a warehouse element'
+      description: 'identifier, in body data structure will be ignored'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WarehouseItem'
+      responses:
+        200:
+          description: OK 
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: 'identifier of the created warehouse'
+                example: 3
+        400:
+          description: 'invalid input data'
+    put:
+      tags:
+        - "Склады"
+      summary: 'updates a warehouse element'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WarehouseItem'
+      responses:
+        200:
+          description: OK 
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: 'changed warehouse identifier'
+                example: 3
+        400:
+          description: 'invalid input data'                  
+  /warehouses/{id}:
+    get:
+      tags:
+        - "Склады"
+      summary: 'gets a warehouse object by its ID'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'warehouse id'
+          schema:
+            type: integer        
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WarehouseItem'    
+    delete:
+      tags:
+        - "Склады"
+      summary: 'deletes a warehouse element by its id'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'warehouse id'
+          schema:
+            type: integer        
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: 'the number of items removed. the count can be 0 if the database architecture does not allow data integrity to be compromised'
+
+
+  /products:
+    get:
+      tags:
+        - "Товары"
+      summary: 'gets a list of products'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfuctsList'   
     post:
       tags: 
         - "Товары"
-      summary: создание нового товара
+      summary: 'creates a product element'
       requestBody:
         content:
           application/json:
@@ -57,18 +151,39 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResultItem'  
-
-  /refs/products/{product_id}/:
+                type: integer
+                description: 'identifier of the created product'
+                example: 3 
+    put:
+      tags: 
+        - "Товары"
+      summary: 'updates a product element'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductItem"
+      responses:
+        200:
+          description: OK 
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: 'changed product identifier'
+                example: 3
+        400:
+          description: 'invalid input data'
+  /products/{id}:
     get:
       tags:
         - "Товары"
-      summary: получение товара по идентификатору
+      summary: 'gets a product element by its id'
       parameters:
-        - name: product_id
+        - name: id
           in: path
           required: true
-          description: идентификатор товара
+          description: 'product id'
           schema:
             type: integer          
       responses:
@@ -82,39 +197,15 @@ paths:
                   $ref: '#/components/schemas/ProductItem'   
         404:
           description: товар не найден
-
-    put:
-      tags: 
-        - "Товары"
-      summary: изменение товара
-      parameters:
-        - name: product_id
-          in: path
-          required: true
-          description: идентификатор товара
-          schema:
-            type: integer        
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ProductItem"      
-      responses:
-        200:
-          description: OK   
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResultItem'  
     delete:
       tags:
         - "Товары"
-      summary: удаление товара
+      summary: 'deletes a product element by its id'
       parameters:
-        - name: product_id
+        - name: id
           in: path
           required: true
-          description: идентификатор товара
+          description: 'product id'
           schema:
             type: integer        
       responses:
@@ -123,20 +214,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProfuctsResponse'                  
-        404:
-          description: товар не найден
-          
-  /refs/products/barcode/{barcode}/:
+                type: integer
+                description: 'the number of items removed. the count can be 0 if the database architecture does not allow data integrity to be compromised'
+  /products/barcode/{barcode}:
     get:
       tags:
         - "Товары"
-      summary: получение товаров по штрих-коду
+      summary: 'find products by barcode'
       parameters:
         - name: barcode
           in: path
           required: true
-          description: штрих-код товара
+          description: 'barcode'
           schema:
             type: string          
       responses:
@@ -147,15 +236,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProductItem'   
-        404:
-          description: товар не найден          
-          
-  /refs/manufacturers:
+                  $ref: '#/components/schemas/ProductListItem'   
+
+  /manufacturers:
     get:
       tags:
         - "Производители"
-      summary: получение списка производителей
+      summary: 'gets a list of manufacturers'
       responses:
         200:
           description: OK
@@ -168,7 +255,25 @@ paths:
     post:
       tags:
         - "Производители"
-      summary: создание нового производителя
+      summary: 'creates a manufacturer element'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManufacturerItem"      
+      responses:
+        200:
+          description: OK   
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: 'identifier of the created manufacturer'
+                example: 3               
+    put:
+      tags:
+        - "Производители"
+      summary: 'updates a manufacturer element'
       requestBody:
         content:
           application/json:
@@ -180,18 +285,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResultItem'               
+                type: integer
+                description: 'changed manufacturer identifier'
+                example: 3
+        400:
+          description: 'invalid input data' 
   
-  /refs/manufacturers/{manufacturer_id}:
+  /manufacturers/{id}:
     get:
       tags:
         - "Производители"
-      summary: получение производителя по идентификатору
+      summary: 'gets a manufacturer element by its id'
       parameters:
-        - name: manufacturer_id
+        - name: id
           in: path
           required: true
-          description: идентификатор производителя
+          description: 'manufacturer id'
           schema:
             type: integer          
       responses:
@@ -204,39 +313,16 @@ paths:
                 items:
                   $ref: '#/components/schemas/ManufacturerItem'   
         404:
-          description: товар не найден
-    put:
-      tags:
-        - "Производители"
-      summary: изменение производителя
-      parameters:
-        - name: manufacturer_id
-          in: path
-          required: true
-          description: идентификатор производителя
-          schema:
-            type: integer  
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ManufacturerItem"      
-      responses:
-        200:
-          description: OK 
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResultItem'               
+          description: производитель не найден
     delete:
       tags:
         - "Производители"
-      summary: удаление производителя
+      summary: 'deletes a manufacturer element by its id'
       parameters:
-        - name: manufacturer_id
+        - name: id
           in: path
           required: true
-          description: идентификатор производителя
+          description: 'manufacturer id'
           schema:
             type: integer        
       responses:
@@ -245,75 +331,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProfuctsResponse'                  
+                type: integer                  
         404:
-          description: товар не найден
+          description: производитель не найден
           
-  /refs/warehouses:
-    get:
-      tags:
-        - "Справочники"
-      summary: получение списка складов
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WarehouseItem' 
-  
-  /refs/warehouses/{whs_id}/:
-    get:
-      tags:
-        - "Справочники"
-      summary: получение склада по идентификатору
-      parameters:
-        - name: whs_id
-          in: path
-          required: true
-          description: идентификатор склада
-          schema:
-            type: string        
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WarehouseItem'                   
-
-  /refs/warehouses/{whs_id}/zones/:
-    get:
-      tags:
-        - "Справочники"
-      summary: получение списка зон склада
-      parameters:
-        - name: whs_id
-          in: path
-          required: true
-          description: идентификатор склада
-          schema:
-            type: string         
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WarehouseItem' 
-
-
-
-
-
-
-
-
-
+               
 
 
 components:
@@ -332,72 +354,132 @@ components:
           type: string
           description: актуальная версия, рекомендуемая к использованию
           example: "v1.1"
-    
-    ResultItem:
+
+    RefListHeader:
       type: object
+      description: 'common reference list header'
+      properties:
+        limit:
+          type: integer
+          description: 'number of records in the result'
+        offset:
+          type: integer
+          description: 'offset of the resulting set relative to the full data sample'
+        count:
+          type: integer
+          description: 'number of records in the complete dataset'
+  
+    # warehouses
+    WarehouseListItem:
+      type: object
+      description: 'warehouse list item'
       properties:
         id:
           type: integer
-          example: 1234
-          description: идентификатор изменяемого/создаваемого объекта
-        message:
+          example: 221
+          description: 'warehouse id'
+        name:
           type: string
-          example: "Не заполнено обязательное поле"
-          description: идентификатор изменяемого/создаваемого объекта
-        error: 
+          example: "my whs"
+          description: 'warehouse name'
+        address:
           type: string
-          example: ""
-          description: техническя информация об ошибке
-          
+          description: 'warehouse address, optional, for example: street, city'
+    WarehouseList:
+      type: object
+      description: 'warehouse list'
+      properties:
+        header:
+          $ref: '#/components/schemas/RefListHeader'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/WarehouseListItem'
     WarehouseItem:
       type: object
-      description: элемент списка складов
+      description: 'warehouse item as object'
       properties:
         id:
           type: integer
           example: 221
-          description: идентификатор склада
+          description: 'warehouse id'
         name:
           type: string
-          example: "мой склад"
-          description: название склада
+          example: "my whs"
+          description: 'warehouse name'
         address:
           type: string
-          description: адрес склада
-      
+          description: 'warehouse address, optional, for example: street, city'
+        acceptance_zone:
+          $ref: '#/components/schemas/ZoneItem'
+        shipping_zone:
+          $ref: '#/components/schemas/ZoneItem'
+        storage_zones:
+          type: array
+          items:
+            $ref: '#/components/schemas/ZoneItem'
+
     ZoneItem:
       type: object
-      description: элемент списка зон
+      description: 'zone item'
       properties:
         id:
           type: integer
-          example: 221
-          description: идентификатор склада
+          description: 'zone id'
         name:
           type: string
-          example: "мой склад"
-          description: название склада
-        address:
-          type: string
-          description: адрес склада  
-          
-    ProductItem:
+          description: 'zone name'
+        zone_type:
+          type: integer
+          description: 'zone type'
+       
+    # products      
+    ProductListItem:
       type: object
-      description: элемент списка товаров
+      description: 'product list item'
       properties:
         id:
           type: integer 
-          description: идентификатор товара
+          description: 'product id'
         name:
           type: string
-          description: наименование товара
+          description: 'product_name'
+        item_number: 
+          type: string
+          description: 'product number (vendor code)'
         manufacturer:
           $ref: '#/components/schemas/ManufacturerItem'
         barcodes:
           type: array
-          description: штрих-коды товара
+          description: 'product barcodes'
           items:
-            type: string
+            $ref: '#/components/schemas/BarcodeItem'
+    ProfuctsList:
+      type: object
+      properties:
+        header: 
+          $ref: '#/components/schemas/RefListHeader'
+        data:
+          type: array
+          items:
+              $ref: '#/components/schemas/ProductListItem'
+    ProductItem:
+      type: object
+      description: 'product item as object'
+      properties:
+        id:
+          type: integer 
+          description: 'product id'
+        name:
+          type: string
+          description: 'product name'
+        manufacturer:
+          $ref: '#/components/schemas/ManufacturerItem'
+        barcodes:
+          type: array
+          description: 'product barcodes'
+          items:
+            $ref: '#/components/schemas/BarcodeItem'
         size:
           type: object
           properties:
@@ -413,30 +495,8 @@ components:
               type: integer
             usefulVolume:
               type: integer 
-    
-    PaggingHeader:
-      type: object
-      properties:
-        limit:
-          type: integer
-          description: запрошенное количество записей
-        offset:
-          type: integer
-          description: смещение
-        count:
-          type: integer
-          description: общее количество записей по отбору
-    
-    ProfuctsResponse:
-      type: object
-      properties:
-        header: 
-          $ref: '#/components/schemas/PaggingHeader'
-        data:
-          type: array
-          items:
-              $ref: '#/components/schemas/ProductItem'
 
+    # manufacturers
     ManufacturerItem:
       type: object
       description: элемент списка производителей
@@ -450,7 +510,22 @@ components:
           description: наименование производителя
           example: Производитель
 
-
+    # barcodes
+    BarcodeItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 'barcode id'
+          example: 224
+        name:
+          type: string
+          description: 'barcode name'
+          example: '0465578113632'
+        type:
+          type: integer
+          description: 'barcode type'
+          example: 1
       
   securitySchemes:
       ApiKeyAuth:        

@@ -50,7 +50,7 @@ func RegisterWhsHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) app
 	routeItems = append(routeItems, app.Route{
 		Name:          "UpdateWhs",
 		Method:        "PUT",
-		Pattern:       "/warehouses/{id}",
+		Pattern:       "/warehouses",
 		SetHeaderJSON: true,
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.UpdateWhs,
@@ -152,24 +152,6 @@ func (wh *WrapHttpHandlers) CreateWhs(w http.ResponseWriter, r *http.Request) {
 }
 
 func (wh *WrapHttpHandlers) UpdateWhs(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	if v, ok := vars["id"]; !ok || v == "0" {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
-		return
-	}
-	valId, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
-		return
-	}
-
-	m, err := wh.Storage.FindWhsById(int64(valId))
-	if err != nil {
-		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
-		return
-	}
-
 	// читаем данные
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
@@ -184,7 +166,11 @@ func (wh *WrapHttpHandlers) UpdateWhs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.Id = m.Id
+	_, err = wh.Storage.FindWhsById(data.Id)
+	if err != nil {
+		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("warehouse not found"))
+		return
+	}
 
 	resultData, err := wh.Storage.UpdateWhs(data)
 	if err != nil {

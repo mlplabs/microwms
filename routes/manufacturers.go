@@ -50,7 +50,7 @@ func RegisterManufacturersHandlers(routeItems app.Routes, wHandlers *WrapHttpHan
 	routeItems = append(routeItems, app.Route{
 		Name:          "UpdateManufacturer",
 		Method:        "PUT",
-		Pattern:       "/manufacturers/{id}",
+		Pattern:       "/manufacturers",
 		SetHeaderJSON: true,
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.UpdateManufacturer,
@@ -159,25 +159,6 @@ func (wh *WrapHttpHandlers) GetManufacturers(w http.ResponseWriter, r *http.Requ
 }
 
 func (wh *WrapHttpHandlers) UpdateManufacturer(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	if v, ok := vars["id"]; !ok || v == "0" {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
-		return
-	}
-
-	valId, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
-		return
-	}
-
-	m, err := wh.Storage.FindManufacturerById(int64(valId))
-	if err != nil {
-		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
-		return
-	}
-
 	// читаем данные
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
@@ -192,7 +173,11 @@ func (wh *WrapHttpHandlers) UpdateManufacturer(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	data.Id = m.Id
+	_, err = wh.Storage.FindManufacturerById(data.Id)
+	if err != nil {
+		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
+		return
+	}
 
 	resultData, err := wh.Storage.UpdateManufacturer(data)
 	if err != nil {

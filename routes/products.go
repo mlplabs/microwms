@@ -57,7 +57,7 @@ func RegisterProductsHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers
 	routeItems = append(routeItems, app.Route{
 		Name:          "UpdateProduct",
 		Method:        "PUT",
-		Pattern:       "/products/{id}",
+		Pattern:       "/products",
 		SetHeaderJSON: true,
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.UpdateProduct,
@@ -217,24 +217,6 @@ func (wh *WrapHttpHandlers) CreateProduct(w http.ResponseWriter, r *http.Request
 }
 
 func (wh *WrapHttpHandlers) UpdateProduct(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	if v, ok := vars["id"]; !ok || v == "0" {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
-		return
-	}
-	valId, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
-		return
-	}
-
-	p, err := wh.Storage.FindProductById(int64(valId))
-	if err != nil {
-		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
-		return
-	}
-
 	// читаем данные
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
@@ -249,7 +231,11 @@ func (wh *WrapHttpHandlers) UpdateProduct(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	data.Id = p.Id
+	_, err = wh.Storage.FindProductById(data.Id)
+	if err != nil {
+		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
+		return
+	}
 
 	resultData, err := wh.Storage.UpdateProduct(data)
 	if err != nil {

@@ -21,7 +21,7 @@ export default {
                 }
             )
         }else {
-            return apiClient.put(refName + '/'+ detailItem.id,
+            return apiClient.put(refName,
                 detailItem,
                 {
                     headers: {

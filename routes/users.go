@@ -50,7 +50,7 @@ func RegisterUsersHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers) a
 	routeItems = append(routeItems, app.Route{
 		Name:          "UpdateUser",
 		Method:        "PUT",
-		Pattern:       "/users/{id}",
+		Pattern:       "/users",
 		SetHeaderJSON: true,
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.UpdateUser,
@@ -161,23 +161,6 @@ func (wh *WrapHttpHandlers) GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (wh *WrapHttpHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	if v, ok := vars["id"]; !ok || v == "0" {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
-		return
-	}
-	valId, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
-		return
-	}
-
-	m, err := wh.Storage.FindUserById(int64(valId))
-	if err != nil {
-		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("product not found"))
-		return
-	}
 
 	// читаем данные
 	body, err := ioutil.ReadAll(r.Body)
@@ -193,7 +176,11 @@ func (wh *WrapHttpHandlers) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.Id = m.Id
+	_, err = wh.Storage.FindUserById(data.Id)
+	if err != nil {
+		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("user not found"))
+		return
+	}
 
 	resultData, err := wh.Storage.UpdateUser(data)
 	if err != nil {

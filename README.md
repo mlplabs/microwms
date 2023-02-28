@@ -2,7 +2,7 @@
 A simple and small WMS (Warehouse Management System)
 
 
-Demo (master deploy): [http://microwms.ru/demo](microwms.ru/demo)
+Demo (master deploy): [http://microwms.ru/demo](http://microwms.ru/demo)
 
 #### Platform
 

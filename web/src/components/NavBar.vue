@@ -26,8 +26,8 @@
               <li><router-link to="/docs/receipt" class="dropdown-item">Поступления</router-link></li>
               <li><router-link to="/shipment" class="dropdown-item">Отгрузки</router-link></li>
               <li class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Остатки товаров</a></li>
-              <li><a class="dropdown-item" href="#">Карточка товара</a></li>
+              <li><router-link class="dropdown-item" to="/reports/remaining" href="#">Остатки товаров</router-link></li>
+              <li><router-link class="dropdown-item" to="/reports/history" href="#">Карточка товара</router-link></li>
               <li class="dropdown-divider"></li>
               <li><router-link to="/props" class="dropdown-item">Настройки</router-link></li>
               <!--

@@ -2,7 +2,7 @@
 <div>
   <div class="btn-toolbar mb-2 mb-md-0 justify-content-between" style="padding-top:5px; padding-bottom: 1px;">
     <div class="btn-group me-2">
-      <button type="button" class="btn btn-sm btn-outline-secondary" @click="$emit('new-item-clicked') ">
+      <button type="button" class="btn btn-sm btn-outline-secondary" :disabled="isReadOnly" @click="$emit('new-item-clicked') ">
         <i class="bi bi-plus"></i>
       </button>
     </div>
@@ -63,7 +63,7 @@
                   <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="#" @click.prevent="$emit('row-delete', j)">Удалить {{j}}</a></li>
+                  <li v-if="!isReadOnly"><a class="dropdown-item" href="#" @click.prevent="$emit('row-delete', j)">Удалить {{j}}</a></li>
                   <li><a class="dropdown-item" href="#">Another action {{row.id}}</a></li>
                   <li><a class="dropdown-item" href="#">Something else here</a></li>
                 </ul>
@@ -108,13 +108,20 @@ export default {
         return [];
       },
     },
+    // display page selection
     isShowPaging: {
       type: Boolean,
       default: true,
     },
+    // display table search field (search not implemented yet)
     isShowSearch:{
       type: Boolean,
       default: true,
+    },
+    // readonly table, does not apply to columns
+    isReadOnly:{
+      type: Boolean,
+      default: false,
     },
     suggestionData:{
       type: Array,

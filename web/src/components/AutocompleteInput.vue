@@ -1,6 +1,6 @@
 <template>
   <div>
-  <input class="form-control" type="text" v-model="textValue" :readonly="propReadonly"
+  <input class="form-control" type="text" :id="propInputId" v-model="textValue" :readonly="propReadonly"
          @keydown.enter = 'onEnter'
          @keydown.down = 'onKeyDown'
          @keydown.up = 'onKeyUp'
@@ -56,8 +56,10 @@ export default {
     },
     propReadonly:{
       type: Boolean
+    },
+    propInputId:{
+      type: String
     }
-
   },
   computed: {
     textValue:{

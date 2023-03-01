@@ -12,6 +12,8 @@ import DocShipment from "@/view/docs/DocShipment";
 import DocReceipt from "@/view/docs/DocReceipt";
 import HardwarePrinters from "@/view/hardware/preference/HardwarePrinters";
 import CatalogUsers from "@/view/refs/CatalogUsers";
+import RemainingProducts from "@/view/reports/RemainingProducts"
+import HistoryProducts from "@/view/reports/HistoryProducts"
 
 const routes = [
     {
@@ -69,6 +71,17 @@ const routes = [
         name: 'ReportsView',
         component: ReportsView
     },
+    {
+        path: '/reports/remaining',
+        name: 'RemainingProducts',
+        component: RemainingProducts
+    },
+    {
+        path: '/reports/history',
+        name: 'HistoryProducts',
+        component: HistoryProducts
+    },
+
     {
         path: '/props',
         name: 'PropertiesView',

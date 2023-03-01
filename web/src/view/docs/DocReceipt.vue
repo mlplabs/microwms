@@ -31,6 +31,7 @@
                   :suggestionData="suggestion"
                   :is-show-paging="false"
                   :is-show-search="false"
+                  :is-read-only="!detailItem.isNew"
                   @row-clicked="onClickTableRow"
                   @new-item-clicked="onClickTableNewItem"
                   @row-delete="onClickTableDelRow"

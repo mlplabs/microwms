@@ -79,6 +79,7 @@ func RegisterHandlers(routeItems app.Routes, wHandlers *routes.WrapHttpHandlers)
 	routeItems = routes.RegisterHardwareHandlers(routeItems, wHandlers)
 	routeItems = routes.RegisterUsersHandlers(routeItems, wHandlers)
 	routeItems = routes.RegisterReceiptHandlers(routeItems, wHandlers)
+	routeItems = routes.RegisterBarcodesHandlers(routeItems, wHandlers)
 	return routeItems
 }
 

@@ -87,7 +87,9 @@ export default {
     DeleteReceiptDoc(refName, id){
         return apiClient.delete(`${refName}/${id}`)
     },
-
+    GetEnum(enumName){
+        return apiClient.get(`enum/${enumName}`)
+    },
     ErrorProcessing(error){
         console.log(error)
         if (error.response) {

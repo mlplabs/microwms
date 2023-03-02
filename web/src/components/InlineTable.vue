@@ -35,7 +35,7 @@
 
               <!-- select - if values > 0 -->
               <select class="form-select" v-if="col.values !== undefined && col.values.length > 0" v-model="row[col.field]">
-                <option v-for="(op, h) in col.values" :key="h" :value="op.key" :selected="op.key === row[col.field]">{{op.val}}</option>
+                <option v-for="(op, h) in col.values" :key="h" :value="op.key">{{op.val}}</option>
               </select>
 
               <!-- suggest - if suggestion == true -->

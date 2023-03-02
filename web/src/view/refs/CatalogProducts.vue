@@ -138,6 +138,7 @@ export default {
         },
         barcodes:[]
       },
+      barcodeTypes:[],
       barcodesColumns:[
         {
           label: "#",
@@ -156,11 +157,7 @@ export default {
           field: "type",
           isKey: false,
           align: 0,
-          values:[
-            {key: 1, val: 'Ean 13', selected: false},
-            {key: 2, val: 'Ean 14', selected: false},
-            {key: 3, val: 'Ean 8', selected: false}
-          ]
+          values: this.barcodeTypes
         },
         {
           label: "...",
@@ -289,7 +286,13 @@ export default {
         })
         .catch(error => { this.errorProc(error) });
     },
-
+    getEnumBarcodeType(){
+      DataProvider.GetEnum('barcode_type')
+        .then((response) => {
+          this.barcodeTypes = response.data
+        })
+        .catch(error => { this.errorProc(error) });
+    },
     errorProc(error){
       console.log(error)
       if (error.response) {
@@ -309,7 +312,7 @@ export default {
     }
   },
   mounted() {
-    console.log(process.env.NODE_ENV);
+    this.getEnumBarcodeType()
     this.updateItemsOnPage(this.currentPage)
   }
 }

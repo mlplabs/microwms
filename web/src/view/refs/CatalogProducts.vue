@@ -157,9 +157,9 @@ export default {
           isKey: false,
           align: 0,
           values:[
-            {key: 1, val: 'Ean 13'},
-            {key: 2, val: 'Ean 14'},
-            {key: 3, val: 'Ean 8'}
+            {key: 1, val: 'Ean 13', selected: false},
+            {key: 2, val: 'Ean 14', selected: false},
+            {key: 3, val: 'Ean 8', selected: false}
           ]
         },
         {
@@ -249,6 +249,7 @@ export default {
         .then((response) => {
           const storeId = response.data;
           if (storeId > 0) {
+            console.log(this.detailItem)
             this.updateItemsOnPage(this.currentPage)
           }
         })

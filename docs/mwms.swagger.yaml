@@ -16,6 +16,8 @@ tags:
 - name: "Товары"
 - name: "Производители"
 - name: "Штрих-коды"
+- name: "Пользователи"
+- name: "Поступление товара"
 
 paths:
   /ping:
@@ -358,7 +360,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SuggestionItem'   
-
+  
+  /receipt:
+    get:
+      tags:
+        - "Поступление товара"
+      summary: 'gets a list of receipt docs'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiptDocsist' 
+        
 components:
   schemas:
     Ping:
@@ -562,7 +577,34 @@ components:
         title:
           type: string
           description: 'suggestion title'
-    
+   
+    ReceiptListItem:
+      type: object
+      description: 'receipt docs list item'
+      properties:
+        id:
+          type: integer
+          description: 'document id'
+        number:
+          type: string
+          description: 'document number'
+        date:
+          type: string
+          description: 'document date'
+        doc_type:
+          type: integer
+          description: 'document type'
+        
+    ReceiptDocsist:
+      type: object
+      description: 'receipt docs list'
+      properties:
+        header:
+          $ref: '#/components/schemas/ListHeader'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceiptListItem'
       
   securitySchemes:
       ApiKeyAuth:        

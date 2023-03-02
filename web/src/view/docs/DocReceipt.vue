@@ -207,7 +207,7 @@ export default {
             this.updateListItems(this.currentPage)
           }
         })
-        .catch(error => { this.errorProc(error) });
+        .catch(error => { DataProvider.ErrorProcessing(error) });
     },
     onClickFormClose(){
 

@@ -157,7 +157,7 @@ export default {
           field: "type",
           isKey: false,
           align: 0,
-          values: this.barcodeTypes
+          values: []
         },
         {
           label: "...",
@@ -178,7 +178,6 @@ export default {
       },
     }
   },
-
   methods:{
     onNewItem(){
       let newBc = this.detailItem.barcodes.find(item => item.id === 0);
@@ -216,6 +215,15 @@ export default {
       }
       this.productsSuggestion = []
       this.manufacturersSuggestion = []
+
+      if (this.barcodeTypes?.length === 0){
+         this.getEnumBarcodeType()
+      }
+
+      for (let i=0; i<this.barcodesColumns?.length;i++ )
+        if (this.barcodesColumns[i].field === 'type')
+          this.barcodesColumns[i].values = this.barcodeTypes
+
     },
 
     onSelectPage(eventData){

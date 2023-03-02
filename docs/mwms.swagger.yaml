@@ -360,7 +360,37 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SuggestionItem'   
-  
+                  
+  /enum/{enum_name}:
+    get:
+      tags: 
+        - "Общие методы"
+      summary: 'gets enum values'
+      parameters:
+        - name: enum_name
+          in: path
+          required: true
+          description: 'enum name'
+          example: 'barcode_type'
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    key:
+                      type: integer
+                      description: 'enum key'
+                    val:
+                      type: string
+                      description: 'enum value'
+            
+    
   /receipt:
     get:
       tags:

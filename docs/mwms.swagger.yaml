@@ -373,7 +373,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReceiptDocsist' 
-        
+    put:
+      tags:
+        - "Поступление товара"
+      summary: 'updates a receipt doc element'
+      description: 'This operation is available only through the API. document modification is prohibited in the interface'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReceiptDocPlainObject'
+      responses:
+        200:
+          description: OK 
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: ''
+                example: 3
+        400:
+          description: 'invalid input data'        
 components:
   schemas:
     Ping:
@@ -578,9 +598,45 @@ components:
           type: string
           description: 'suggestion title'
    
+   
+    # receipt 
+    # document list item 
     ReceiptListItem:
       type: object
       description: 'receipt docs list item'
+      properties:
+        id:
+          type: integer
+          example: 21
+          description: 'document id'
+        number:
+          type: string
+          example: '000021.2'
+          description: 'document number'
+        date:
+          type: string
+          example: '20.02.2023'
+          description: 'document date'
+        doc_type:
+          type: integer
+          example: 2
+          description: 'document type'
+    
+    # documents list
+    ReceiptDocsist:
+      type: object
+      description: 'receipt docs list'
+      properties:
+        header:
+          $ref: '#/components/schemas/ListHeader'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceiptListItem'
+        
+    # receipt document object (plain - for web)
+    ReceiptDocPlainObject:
+      type: object
       properties:
         id:
           type: integer
@@ -594,17 +650,42 @@ components:
         doc_type:
           type: integer
           description: 'document type'
-        
-    ReceiptDocsist:
-      type: object
-      description: 'receipt docs list'
-      properties:
-        header:
-          $ref: '#/components/schemas/ListHeader'
-        data:
+        items:
           type: array
           items:
-            $ref: '#/components/schemas/ReceiptListItem'
+            $ref: '#/components/schemas/ReceiptDocPlainRowItem'
+
+    # row of receipt document object (plain - for web)
+    ReceiptDocPlainRowItem:
+      type: object
+      description: 'receipt doc row item'
+      properties:
+        product_id:
+          type: integer
+          description: 'product ID'
+        product_name:
+          type: string
+          description: 'product name'
+        product_item_number:
+          type: string
+          description: 'procuct code (vendor code)'
+        product_manufacturer:
+          type: string
+          description: 'manufacturer name'
+        product_manufacturer_id:
+          type: integer
+          description: 'manufacturer ID'
+        quantity:
+          type: integer
+          description: 'incoming quantity'
+        cell_id:
+          type: integer
+          description: 'cell ID'
+        cell_name:
+          type: string
+          description: 'cell name'
+        
+          
       
   securitySchemes:
       ApiKeyAuth:        

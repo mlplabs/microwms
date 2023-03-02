@@ -128,7 +128,7 @@ func RegisterReceiptHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers)
 	routeItems = append(routeItems, app.Route{
 		Name:          "UpdateReceiptDoc",
 		Method:        "PUT",
-		Pattern:       "/receipt/{id}",
+		Pattern:       "/receipt",
 		SetHeaderJSON: true,
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.UpdateReceiptDoc,
@@ -207,24 +207,6 @@ func (wh *WrapHttpHandlers) CreateReceiptDoc(w http.ResponseWriter, r *http.Requ
 }
 
 func (wh *WrapHttpHandlers) UpdateReceiptDoc(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	if v, ok := vars["id"]; !ok || v == "0" {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
-		return
-	}
-	valId, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
-		return
-	}
-
-	_, err = wh.Storage.FindReceiptDocById(int64(valId))
-	if err != nil {
-		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("document not found"))
-		return
-	}
-
 	// читаем данные
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
@@ -236,6 +218,12 @@ func (wh *WrapHttpHandlers) UpdateReceiptDoc(w http.ResponseWriter, r *http.Requ
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
+		return
+	}
+
+	_, err = wh.Storage.FindReceiptDocById(int64(data.Id))
+	if err != nil {
+		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("document not found"))
 		return
 	}
 

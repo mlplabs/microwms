@@ -2,7 +2,7 @@
 <div>
   <div class="btn-toolbar mb-2 mb-md-0 justify-content-between" style="padding-top:5px; padding-bottom: 1px;">
     <div class="btn-group me-2">
-      <button type="button" class="btn btn-sm btn-outline-secondary" :disabled="isReadOnly" @click="$emit('new-item-clicked') ">
+      <button type="button" class="btn btn-sm btn-outline-secondary" :disabled="isReadOnly" @click="$emit('onNewItemClick') ">
         <i class="bi bi-plus"></i>
       </button>
     </div>
@@ -26,7 +26,7 @@
       <!-- table body -->
       <template v-if="rows?.length > 0">
         <tbody>
-        <tr v-for="(row, j) in rows"  :key="j" @click="$emit('row-clicked', row)">
+        <tr v-for="(row, j) in rows"  :key="j" @click="$emit('onRowClick', row)">
 
           <!-- set column css class -->
           <td v-for="(col, index) in columns" :key="index" :class="{'col_id': col.isKey, 'col_action': col.field === 'actions', 'text-start': col.align === 0, 'text-center': col.align === 1, 'text-end': col.align === 2 }">
@@ -45,8 +45,8 @@
                 v-model:prop-suggestions="suggestionValue"
                 v-model:prop-key="col.field"
                 v-model:prop-readonly="col.readonly"
-                @onUpdateData="$emit('update-suggestion', $event)"
-                @onSelectData="$emit('select-suggestion', row, $event)"
+                @onUpdateData="$emit('onUpdateSuggestion', $event)"
+                @onSelectData="$emit('onSelectSuggestion', row, $event)"
               >
               </autocomplete-input>
 
@@ -63,7 +63,7 @@
                   <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li v-if="!isReadOnly"><a class="dropdown-item" href="#" @click.prevent="$emit('row-delete', j)">Удалить {{j}}</a></li>
+                  <li v-if="!isReadOnly"><a class="dropdown-item" href="#" @click.prevent="$emit('onRowDelete', j)">Удалить {{j}}</a></li>
                   <li><a class="dropdown-item" href="#">Another action {{row.id}}</a></li>
                   <li><a class="dropdown-item" href="#">Something else here</a></li>
                 </ul>
@@ -82,7 +82,7 @@
 
     </table>
 
-    <pagination-bar v-show="isShowPaging" v-bind:param-current-page=currentPage v-bind:param-count-rows=countRows v-bind:param-limit-rows=limitRows v-on:selectPage="$emit('page-selected', 1)"></pagination-bar>
+    <pagination-bar v-show="isShowPaging" v-bind:param-current-page=currentPage v-bind:param-count-rows=countRows v-bind:param-limit-rows=limitRows v-on:selectPage="$emit('onPageSelect', 1)"></pagination-bar>
   </div>
 </template>
 

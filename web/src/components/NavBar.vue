@@ -24,10 +24,10 @@
             <ul class="dropdown-menu" aria-labelledby="dropdown05">
               <li><router-link to="/refs" class="dropdown-item">Справочники</router-link></li>
               <li><router-link to="/docs/receipt" class="dropdown-item">Поступления</router-link></li>
-              <li><router-link to="/shipment" class="dropdown-item">Отгрузки</router-link></li>
+              <li><router-link to="/docs/shipment" class="dropdown-item">Отгрузки</router-link></li>
               <li class="dropdown-divider"></li>
               <li><router-link class="dropdown-item" to="/reports/remaining" href="#">Остатки товаров</router-link></li>
-              <li><router-link class="dropdown-item" to="/reports/history" href="#">Карточка товара</router-link></li>
+              <li><router-link class="dropdown-item" to="/reports/history" href="#">Движение товара</router-link></li>
               <li class="dropdown-divider"></li>
               <li><router-link to="/props" class="dropdown-item">Настройки</router-link></li>
               <!--

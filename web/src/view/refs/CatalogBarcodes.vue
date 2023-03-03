@@ -81,7 +81,6 @@ export default {
       limitRows: 7,
       currentPage: 1,
       detailItem: {
-        isNew: false,
         id: 0,
         name: "",
       },
@@ -92,8 +91,7 @@ export default {
   methods:{
     showDetailForm(id){
       this.resetDetailItem()
-      this.detailItem.isNew = (id === 0)
-      if (this.detailItem.isNew) {
+      if (this.detailItem.id === 0) {
         return
       }
       this.getDetailItem(id)

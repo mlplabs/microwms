@@ -12,15 +12,15 @@
             <form class="row g-3">
               <div class="col-md-3">
                 <label for="inputNumber" class="form-label">Номер</label>
-                <input type="text" class="form-control" id="inputNumber" v-model="detailItem.number" :readonly="!detailItem.isNew">
+                <input type="text" class="form-control" id="inputNumber" v-model="detailItem.number" :readonly="detailItem.id !== 0">
               </div>
               <div class="col-md-3">
                 <label for="inputDate" class="form-label">Дата</label>
-                <input type="text" class="form-control" id="inputDate" v-model="detailItem.date" :readonly="!detailItem.isNew">
+                <input type="text" class="form-control" id="inputDate" v-model="detailItem.date" :readonly="detailItem.id !== 0">
               </div>
               <div class="col-md-3">
                 <label for="inputWhs" class="form-label">Склад</label>
-                <input type="text" class="form-control" id="inputWhs" v-model="detailItem.whs" :readonly="!detailItem.isNew">
+                <input type="text" class="form-control" id="inputWhs" v-model="detailItem.whs" :readonly="detailItem.id !== 0">
               </div>
 
               <div class="col-12 table-responsive-xl">
@@ -31,11 +31,11 @@
                   :suggestionData="suggestion"
                   :is-show-paging="false"
                   :is-show-search="false"
-                  @row-clicked="onClickTableRow"
-                  @new-item-clicked="onClickTableNewItem"
-                  @row-delete="onClickTableDelRow"
-                  @update-suggestion="onUpdateSuggestionTable"
-                  @select-suggestion="onSelectSuggestionTable"
+                  @onRowClick="onClickTableRow"
+                  @onNewItem-clicked="onClickTableNewItem"
+                  @onRowDelete="onClickTableDelRow"
+                  @onUpdateSuggestion="onUpdateSuggestionTable"
+                  @onSelectSuggestion="onSelectSuggestionTable"
                 ></inline-table>
 
               </div>
@@ -113,7 +113,6 @@ export default {
       limitRows: 11,
       currentPage: 1,
       detailItem:{
-        isNew: false,
         id: 0,
         number: "",
         date: "08.02.2023",
@@ -213,24 +212,22 @@ export default {
     },
     showForm(id){
       this.resetDetailItem()
-      this.detailItem.isNew = (id === 0)
 
       for(let i=0; i< this.productColumns.length; i++){
         if (this.productColumns[i].field === 'product_name'
           || this.productColumns[i].field === 'product_manufacturer'
           || this.productColumns[i].field === "quantity") {
-          this.productColumns[i].readonly = !this.detailItem.isNew
+          this.productColumns[i].readonly = this.detailItem.id !== 0
         }
       }
 
-      if (this.detailItem.isNew) {
+      if (this.detailItem.id === 0) {
         return
       }
       this.getDetailItem(id)
     },
     resetDetailItem(){
       this.detailItem = {
-        isNew: false,
         id: 0,
         number: '',
         date: '',

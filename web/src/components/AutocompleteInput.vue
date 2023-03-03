@@ -122,9 +122,7 @@ export default {
     },
     onKeypress(event){
       const val = event.target.value
-      console.log(this.matches)
       if (val === ''){
-        console.log('text val is empty ' + val)
         return
       }
       this.$emit('onUpdateData', {

@@ -4,7 +4,7 @@
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 v-if="detailItem.isNew" class="modal-title">{{lng.title_form_create}}</h5>
+            <h5 v-if="detailItem.id === 0" class="modal-title">{{lng.title_form_create}}</h5>
             <h5 v-else class="modal-title">{{lng.title_form_edit}}</h5>
 
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closeDetailForm"></button>
@@ -127,7 +127,6 @@ export default {
       limitRows: 7,
       currentPage: 1,
       detailItem: {
-        isNew: false,
         id: 0,
         name: "",
         address: "",
@@ -178,8 +177,7 @@ export default {
   methods:{
     showDetailForm(id){
       this.resetDetailItem()
-      this.detailItem.isNew = (id === 0)
-      if (this.detailItem.isNew) {
+      if (this.detailItem.id === 0) {
         return
       }
       this.getDetailItem(id)

@@ -90,6 +90,10 @@ export default {
     GetEnum(enumName){
         return apiClient.get(`enum/${enumName}`)
     },
+    GetReport(reportName){
+        return apiClient.get(`reports/${reportName}`)
+    },
+
     ErrorProcessing(error){
         console.log(error)
         if (error.response) {

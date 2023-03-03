@@ -32,10 +32,10 @@
       </tr>
       </thead>
       <tbody>
-      <tr>
-        <td></td>
-        <td></td>
-        <td></td>
+      <tr v-for="(item, index) in remainingData" :key="index">
+        <td>{{item.zone.name}}</td>
+        <td>{{item.cell.name}}</td>
+        <td>{{item.quantity}}</td>
       </tr>
       </tbody>
     </table>
@@ -61,18 +61,26 @@ export default {
       lng: {
         title: "Остатки товаров",
       },
+      remainingData: []
     }
   },
   methods: {
     generateReport(){
-
+      this.requestRemainingData()
     },
     updateProductsData(emitData){
       DataProvider.GetSuggestionReference('products', emitData.val)
         .then((response) => {
           this.conditionSuggestion = response.data
         })
-        .catch(error => { this.errorProc(error) });
+        .catch(error => { DataProvider.ErrorProcessing(error) });
+    },
+    requestRemainingData(){
+      DataProvider.GetReport('remaining')
+        .then((response) => {
+          this.remainingData = response.data
+        })
+        .catch(error => { DataProvider.ErrorProcessing(error) });
     },
   }
 }

@@ -26,6 +26,7 @@
     <table class="table table-striped table-hover table-bordered">
       <thead>
       <tr>
+        <th scope="col" class="col_head">Товар</th>
         <th scope="col" class="col_head">Зона</th>
         <th scope="col" class="col_head">Ячейка</th>
         <th scope="col" class="col_head">Остаток</th>
@@ -33,6 +34,7 @@
       </thead>
       <tbody>
       <tr v-for="(item, index) in remainingData" :key="index">
+        <td>{{item.product.name}}<br><small>{{item.manufacturer.name}}</small></td>
         <td>{{item.zone.name}}</td>
         <td>{{item.cell.name}}</td>
         <td>{{item.quantity}}</td>

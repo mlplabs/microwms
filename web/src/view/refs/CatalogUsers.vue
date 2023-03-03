@@ -130,7 +130,7 @@ export default {
   methods:{
     showDetailForm(id){
       this.resetDetailItem()
-      if (this.detailItem.id === 0) {
+      if (id === 0) {
         return
       }
       this.getDetailItem(id)

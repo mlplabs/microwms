@@ -212,17 +212,18 @@ export default {
 
     },
     showForm(id){
+      console.log(this.detailItem.id)
       this.resetDetailItem()
 
       for(let i=0; i< this.productColumns.length; i++){
         if (this.productColumns[i].field === 'product_name'
           || this.productColumns[i].field === 'product_manufacturer'
           || this.productColumns[i].field === "quantity") {
-          this.productColumns[i].readonly = this.detailItem.id !== 0
+          this.productColumns[i].readonly = id !== 0
         }
       }
 
-      if (this.detailItem.id === 0) {
+      if (id === 0){
         return
       }
       this.getDetailItem(id)
@@ -299,6 +300,7 @@ export default {
     },
     // Getting product info
     getDetailItem(id){
+      console.log(id)
       DataProvider.GetReceiptDoc("receipt", id)
         .then((response) => {
           this.detailItem = response.data

@@ -217,11 +217,11 @@ export default {
         if (this.productColumns[i].field === 'product_name'
           || this.productColumns[i].field === 'product_manufacturer'
           || this.productColumns[i].field === "quantity") {
-          this.productColumns[i].readonly = this.detailItem.id !== 0
+          this.productColumns[i].readonly = id !== 0
         }
       }
 
-      if (this.detailItem.id === 0) {
+      if (id === 0) {
         return
       }
       this.getDetailItem(id)

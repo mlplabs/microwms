@@ -130,9 +130,21 @@ export default {
 
     onDeleteBarcodeItem(emitData){
       let idx = this.detailItem.barcodes.findIndex(item => item.id === emitData.id);
-      this.detailItem.barcodes.splice(idx, 1)
+      this.deleteBarcodeItem(emitData.id, idx)
     },
 
+    deleteBarcodeItem(id, idx){
+      DataProvider.DeleteItemReference('barcodes', id)
+        .then((response) => {
+          const affRows = response.data;
+          if (affRows !== 1){
+            console.log('delete failed')
+          }
+          // удалим из списка, когда из бвзы удалим
+          this.detailItem.barcodes.splice(idx, 1)
+        })
+        .catch(error => { DataProvider.ErrorProcessing(error) });
+    },
 
     getDetailItem(id){
       DataProvider.GetItemReference('products', id)

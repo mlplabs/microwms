@@ -23,7 +23,7 @@
       </div>
       <div class="col d-flex align-items-start">
         <div>
-          <router-link to="/refs/products" class="text-decoration-none fw-bold fs-5">Еще один справочник</router-link>
+          <router-link to="#" class="text-decoration-none fw-bold fs-5">Еще один справочник</router-link>
           <p></p>
         </div>
       </div>

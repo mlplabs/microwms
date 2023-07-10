@@ -212,7 +212,6 @@ export default {
 
     },
     showForm(id){
-      console.log(this.detailItem.id)
       this.resetDetailItem()
 
       for(let i=0; i< this.productColumns.length; i++){
@@ -300,7 +299,6 @@ export default {
     },
     // Getting product info
     getDetailItem(id){
-      console.log(id)
       DataProvider.GetReceiptDoc("receipt", id)
         .then((response) => {
           this.detailItem = response.data

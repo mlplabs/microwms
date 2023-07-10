@@ -57,7 +57,6 @@ export default {
         return apiClient.get(`printers`)
     },
     GetReceiptDoc(refName, id){
-        console.log(`${refName}/${id}`)
         return apiClient.get(`${refName}/${id}`)
     },
     GetReceiptDocs(refName, page, limit, offset){

@@ -63,7 +63,7 @@
                   <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li v-if="!isReadOnly"><a class="dropdown-item" href="#" @click.prevent="$emit('onRowDelete', j)">Удалить {{j}}</a></li>
+                  <li v-if="!isReadOnly"><a class="dropdown-item" href="#" @click.prevent="$emit('onRowDelete', row)">Удалить {{j}}</a></li>
                   <li><a class="dropdown-item" href="#">Another action {{row.id}}</a></li>
                   <li><a class="dropdown-item" href="#">Something else here</a></li>
                 </ul>

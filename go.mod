@@ -7,11 +7,11 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.5.1
 	github.com/mlplabs/app-utils v0.0.0-20221215103534-d034b483b7e2
-	github.com/mlplabs/microwms-core v0.0.0-20230303085817-ff2dd387a6f1
+	github.com/mlplabs/microwms-core v0.0.0-20230711064909-0ecf1dbd8094
 )
 
 require (
 	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
-	github.com/lib/pq v1.10.7 // indirect
+	github.com/lib/pq v1.10.9 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
 )

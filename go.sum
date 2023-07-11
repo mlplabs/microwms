@@ -8,6 +8,8 @@ github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/lib/pq v1.10.7 h1:p7ZhMD+KsSRozJr34udlUrhboJwWAgCg34+/ZZNvZZw=
 github.com/lib/pq v1.10.7/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
+github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
+github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/mlplabs/app-utils v0.0.0-20221215103534-d034b483b7e2 h1:9glXyU4fOqGe+ar3I9ak0/PskuPrqYqCxKztj+CBeUo=
 github.com/mlplabs/app-utils v0.0.0-20221215103534-d034b483b7e2/go.mod h1:fA/sXPRsdqpGrIrgbGZo4W1wCn7JAAQrr3KYsOwTeiw=
 github.com/mlplabs/microwms-core v0.0.0-20230221064939-0ea210e33ae1 h1:PsmIOf53+jGND9RuDj0gwwXUoY7ZYuzrfid/V7z7OVI=
@@ -26,5 +28,7 @@ github.com/mlplabs/microwms-core v0.0.0-20230303084415-f314b4d645f9 h1:47Bl9OlTE
 github.com/mlplabs/microwms-core v0.0.0-20230303084415-f314b4d645f9/go.mod h1:H968aB8ZdZnWOnJh/xCM8/u1/5jccXi9FmdoD3TgrHw=
 github.com/mlplabs/microwms-core v0.0.0-20230303085817-ff2dd387a6f1 h1:FJ0KAXq5GUEJqAPWczLtEzfyJLS4rTlhY4+PSphA9UI=
 github.com/mlplabs/microwms-core v0.0.0-20230303085817-ff2dd387a6f1/go.mod h1:H968aB8ZdZnWOnJh/xCM8/u1/5jccXi9FmdoD3TgrHw=
+github.com/mlplabs/microwms-core v0.0.0-20230711064909-0ecf1dbd8094 h1:BgAZydnSiqhcK0HhQQxZmDqp5sJ1ZOKjG1YqeEn8/mA=
+github.com/mlplabs/microwms-core v0.0.0-20230711064909-0ecf1dbd8094/go.mod h1:H968aB8ZdZnWOnJh/xCM8/u1/5jccXi9FmdoD3TgrHw=
 golang.org/x/crypto v0.5.0 h1:U/0M97KRkSFvyD/3FSmdP5W5swImpNgle/EHFhOsQPE=
 golang.org/x/crypto v0.5.0/go.mod h1:NK/OQwhpMQP3MwtdjgLlYHnH9ebylxKWv3e0fK+mkQU=

@@ -129,6 +129,7 @@ export default {
     },
 
     onDeleteBarcodeItem(emitData){
+      console.log('del barcode ' + emitData)
       let idx = this.detailItem.barcodes.findIndex(item => item.id === emitData.id);
       this.deleteBarcodeItem(emitData.id, idx)
     },

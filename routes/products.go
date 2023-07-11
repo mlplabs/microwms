@@ -272,7 +272,10 @@ func (wh *WrapHttpHandlers) DeleteProduct(w http.ResponseWriter, r *http.Request
 	}
 	resultData, err := wh.Storage.DeleteProduct(p)
 	if err != nil {
-		app.Log.Warning.Printf("item deleting error, %v", err)
+		if err.(*core.WrapError).Code == core.ForeignKeyError {
+			app.ResponseERROR(w, http.StatusInternalServerError, fmt.Errorf("item deleting error, foreign key"))
+			return
+		}
 		app.ResponseERROR(w, http.StatusInternalServerError, fmt.Errorf("item deleting error"))
 		return
 	}

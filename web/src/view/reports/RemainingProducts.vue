@@ -103,7 +103,7 @@ export default {
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
     requestRemainingData(){
-      DataProvider.GetReport('remaining')
+      DataProvider.GetReport('remaining', this.condition.id)
         .then((response) => {
           this.remainingData = response.data
         })

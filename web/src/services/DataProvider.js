@@ -90,8 +90,8 @@ export default {
     GetEnum(enumName){
         return apiClient.get(`enum/${enumName}`)
     },
-    GetReport(reportName){
-        return apiClient.get(`reports/${reportName}`)
+    GetReport(reportName, id){
+        return apiClient.get(`reports/${reportName}/item/${id}`)
     },
 
     ErrorProcessing(error){

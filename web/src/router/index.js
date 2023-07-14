@@ -72,9 +72,10 @@ const routes = [
         component: ReportsView
     },
     {
-        path: '/reports/remaining',
+        path: '/reports/remaining/:propProductId',
         name: 'RemainingProducts',
-        component: RemainingProducts
+        component: RemainingProducts,
+        props: castRouteParams
     },
     {
         path: '/reports/history',
@@ -95,6 +96,12 @@ const routes = [
 
     },
 ]
+
+function castRouteParams(route) {
+    return {
+        propProductId: Number(route.params.propProductId),
+    };
+}
 
 const router = createRouter({
     history: createWebHashHistory(),

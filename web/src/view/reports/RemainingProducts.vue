@@ -73,11 +73,17 @@ import router from "@/router";
 export default {
   name: "RemainingProducts",
   components: {ProductForm, AutocompleteInput},
+  props: {
+    propProductId: {
+      type: Number,
+      required: true
+    },
+  },
   data(){
     return{
       currentProductId:0,
       condition:{
-        id: 0,
+        id: this.propProductId,
         text: ""
       },
       conditionSuggestion:[],
@@ -92,9 +98,19 @@ export default {
     showDetailForm(id){
       this.currentProductId = id
     },
+    // Действие Сформировать отчет
     generateReport(){
       this.requestRemainingData()
     },
+    // Получение данных товара, при выполнении отчета по ссылке, когда известен только id
+    getProductsData(id){
+      DataProvider.GetItemReference('products', id)
+        .then((response) => {
+          this.condition.text = response.data.name
+        })
+        .catch(error => { DataProvider.ErrorProcessing(error) });
+    },
+    // Обновление подсказок
     updateProductsData(emitData){
       DataProvider.GetSuggestionReference('products', emitData.val)
         .then((response) => {
@@ -102,6 +118,7 @@ export default {
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
+    // Процедура запроса данных
     requestRemainingData(){
       DataProvider.GetReport('remaining', this.condition.id)
         .then((response) => {
@@ -110,11 +127,15 @@ export default {
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
     showReport(reportName, id){
+      // TODO: посмотреть друой отчет
       console.log(`show report for ${id}`)
       router.push(`/reports/${reportName}`)
     },
   },
   mounted() {
+    if (this.condition.text === ''){
+      this.getProductsData(this.condition.id)
+    }
     this.generateReport()
   }
 }

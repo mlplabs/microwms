@@ -112,7 +112,7 @@ export default {
     },
     showReport(reportName, id){
       console.log(`show report for ${id}`)
-      router.push(`/reports/${reportName}`)
+      router.push({name: 'RemainingProducts', params: {propProductId: id}})
     },
 
     printLabel(id){

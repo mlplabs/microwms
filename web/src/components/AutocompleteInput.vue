@@ -6,7 +6,7 @@
          @keydown.up = 'onKeyUp'
          @input = 'onChange'
          @click = 'onClick'
-         @keydown = 'onKeypress'
+         @keyup = 'onKeypress'
   />
   <div class="dropdown" style="position:relative; min-width: inherit">
     <ul class="dropdown-menu" v-bind:class="{'show':openSuggestion}">
@@ -102,14 +102,17 @@ export default {
       this.open = false;
     },
     onKeyUp() {
+      console.log('key up')
       if(this.current > 0)
         this.current--;
     },
     onKeyDown() {
+      console.log('key down')
       if(this.current < this.matches.length - 1)
         this.current++;
     },
     onChange() {
+      console.log('on change')
       if (this.open === false) {
         this.open = true;
         this.current = 0;
@@ -122,6 +125,7 @@ export default {
     },
     onKeypress(event){
       const val = event.target.value
+      console.log('key press ' + val + ' ' + this.textValue)
       if (val === ''){
         return
       }

@@ -111,8 +111,7 @@ export default {
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
     showReport(reportName, id){
-      console.log(`show report for ${id}`)
-      router.push({name: 'RemainingProducts', params: {propProductId: id}})
+      router.push({name: reportName, params: {propProductId: id}})
     },
 
     printLabel(id){

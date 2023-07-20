@@ -1,4 +1,10 @@
 <template>
+  <div id="detailForm" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <product-form :prop-product-id="this.currentProductId"  @onUpdateData="this.generateReport"></product-form>
+    </div>
+  </div>
+
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h5>{{ lng.title }}</h5>
   </div>
@@ -77,14 +83,22 @@
 import AutocompleteInput from "@/components/AutocompleteInput";
 import DataProvider from "@/services/DataProvider";
 //import InlineTable from "@/components/InlineTable";
+import ProductForm from "@/view/refs/forms/ProductForm";
 
 export default {
   name: "HistoryProducts",
-  components: {AutocompleteInput},
+  components: {AutocompleteInput, ProductForm},
+  props: {
+    propProductId: {
+      type: Number,
+      required: true
+    },
+  },
   data(){
     return{
+      currentProductId:0,
       condition:{
-        id: 0,
+        id: this.propProductId,
         text: ""
       },
       conditionSuggestion:[],
@@ -94,8 +108,21 @@ export default {
     }
   },
   methods: {
+    // Открываем форму нового или существующего
+    showDetailForm(id){
+      this.currentProductId = id
+    },
+    // Действие Сформировать отчет
     generateReport(){
-
+      this.requestHistoryData()
+    },
+    // Процедура запроса данных
+    requestHistoryData(){
+      DataProvider.GetReport('history', this.condition.id)
+        .then((response) => {
+          this.remainingData = response.data
+        })
+        .catch(error => { DataProvider.ErrorProcessing(error) });
     },
     updateProductsData(emitData){
       DataProvider.GetSuggestionReference('products', emitData.val)
@@ -104,6 +131,12 @@ export default {
         })
         .catch(error => { this.errorProc(error) });
     },
+    mounted() {
+      if (this.condition.text === ''){
+        this.getProductsData(this.condition.id)
+      }
+      this.generateReport()
+    }
   }
 }
 </script>

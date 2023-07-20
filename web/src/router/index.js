@@ -73,14 +73,15 @@ const routes = [
     },
     {
         path: '/reports/remaining/:propProductId',
-        name: 'RemainingProducts',
+        name: 'remaining',
         component: RemainingProducts,
         props: castRouteParams
     },
     {
-        path: '/reports/history',
-        name: 'HistoryProducts',
-        component: HistoryProducts
+        path: '/reports/history/:propProductId',
+        name: 'history',
+        component: HistoryProducts,
+        props: castRouteParams
     },
 
     {

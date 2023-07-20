@@ -27,7 +27,7 @@
               <li><router-link to="/docs/shipment" class="dropdown-item">Отгрузки</router-link></li>
               <li class="dropdown-divider"></li>
               <li><router-link class="dropdown-item" to="/reports/remaining/0" href="#">Остатки товаров</router-link></li>
-              <li><router-link class="dropdown-item" to="/reports/history" href="#">Движение товара</router-link></li>
+              <li><router-link class="dropdown-item" to="/reports/history/0" href="#">Движение товара</router-link></li>
               <li class="dropdown-divider"></li>
               <li><router-link to="/props" class="dropdown-item">Настройки</router-link></li>
               <!--

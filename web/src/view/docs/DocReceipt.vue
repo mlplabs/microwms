@@ -1,68 +1,68 @@
 <template>
-  <div>
-    <div id="detailForm" class="modal fade" tabindex="-1">
-      <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">{{ lng.title_form_create }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="onClickFormClose"></button>
-          </div>
-          <div class="modal-body">
-
-            <form class="row g-3">
-              <div class="col-md-3">
-                <label for="inputNumber" class="form-label">Номер</label>
-                <input type="text" class="form-control" id="inputNumber" v-model="detailItem.number" :readonly="detailItem.id !== 0">
-              </div>
-              <div class="col-md-3">
-                <label for="inputDate" class="form-label">Дата</label>
-                <input type="text" class="form-control" id="inputDate" v-model="detailItem.date" :readonly="detailItem.id !== 0">
-              </div>
-              <div class="col-md-3">
-                <label for="inputWhs" class="form-label">Склад</label>
-                <input type="text" class="form-control" id="inputWhs" v-model="detailItem.whs" :readonly="detailItem.id !== 0">
-              </div>
-
-              <div class="col-12 table-responsive-xl">
-
-                <inline-table
-                  :columns="productColumns"
-                  :rows="detailItem.items"
-                  :suggestionData="suggestion"
-                  :is-show-paging="false"
-                  :is-show-search="false"
-                  :is-read-only="detailItem.id !== 0"
-                  @onRowClick="onClickTableRow"
-                  @onNewItemClick="onClickTableNewItem"
-                  @onRowDelete="onClickTableDelRow"
-                  @onUpdateSuggestion="onUpdateSuggestionTable"
-                  @onSelectSuggestion="onSelectSuggestionTable"
-                ></inline-table>
-
-              </div>
-
-            </form>
-
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="onClickFormClose">{{lng.btn_form_close}}</button>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="onClickFormStore">{{lng.btn_form_store}}</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h5>{{lng.title}}</h5>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group me-2">
-        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailForm"  @click="showForm(0) ">
+        <button type="button" class="btn btn-sm btn-outline-secondary" @click="showForm(0) ">
           <i class="bi bi-plus"></i>
         </button>
       </div>
     </div>
   </div>
 
+  <div id="inlineForm" v-show="inlineFormIsOpen" class="container-md p-3 border mb-2 start-0">
+    <form class="row g-2" >
+      <div class="col-md-3" v-show="receiptAsDocument">
+        <label for="inputNumber" class="form-label">Номер</label>
+        <input type="text" class="form-control" id="inputNumber" v-model="detailItem.number" :readonly="detailItem.id !== 0">
+      </div>
+      <div class="col-md-3" v-show="receiptAsDocument">
+        <label for="inputDate" class="form-label">Дата</label>
+        <input type="text" class="form-control" id="inputDate" v-model="detailItem.date" :readonly="detailItem.id !== 0">
+      </div>
+      <div class="col-md-3" v-show="receiptAsDocument">
+        <label for="inputWhs" class="form-label">Склад</label>
+        <input type="text" class="form-control" id="inputWhs" v-model="detailItem.whs" :readonly="detailItem.id !== 0">
+      </div>
+
+      <div class="col-md-6">
+        <label for="inputName" class="form-label">Наименование</label>
+        <autocomplete-input
+            v-model:prop-suggestions="itemNameSuggestion"
+            v-model:prop-selection-id="detailItem.Id"
+            v-model:prop-selection-val="detailItem.Name"
+            @onUpdateData="updateProductsData"
+            @onSelectData="fillProductFields"
+        ></autocomplete-input>
+      </div>
+      <div class="col-md-6">
+        <label for="inputMnf" class="form-label">Производитель</label>
+        <autocomplete-input
+            v-model:prop-suggestions="itemMnfSuggestion"
+            v-model:prop-selection-id="detailItem.MnfId"
+            v-model:prop-selection-val="detailItem.MnfName"
+            @onUpdateData="updateManufacturersData"
+        ></autocomplete-input>
+      </div>
+      <div class="col-md-4">
+        <label for="inputNumber" class="form-label">Штрих-код</label>
+        <input type="text" class="form-control" id="inputNumber">
+      </div>
+      <div class="col-md-4">
+        <label for="inputNumber" class="form-label">Ячейка</label>
+        <input type="text" class="form-control" id="inputNumber">
+      </div>
+      <div class="col-md-4">
+        <label for="inputNumber" class="form-label">Количество</label>
+        <input type="number" class="form-control" id="inputNumber" min="0">
+      </div>
+      <div class="col-md-12 text-end">
+        <button type="button" class="btn btn-secondary me-2" @click="onClickFormClose">{{lng.btn_form_close}}</button>
+        <button type="button" class="btn btn-primary" @click="onClickFormStore">{{lng.btn_form_store}}</button>
+      </div>
+
+    </form>
+  </div>
   <div class="table-responsive">
     <table class="table table-striped table-hover table-bordered">
       <thead>
@@ -101,28 +101,35 @@
 
 <script>
 
-import InlineTable from "@/components/InlineTable";
 import DataProvider from "@/services/DataProvider";
 import PaginationBar from "@/components/PaginationBar";
+import AutocompleteInput from "@/components/AutocompleteInput";
 
 export default {
   name: "DocReceipt",
-  components: {InlineTable, PaginationBar},
+  components: {AutocompleteInput, PaginationBar},
   data(){
     return{
       countRows: 0,
       limitRows: 11,
       currentPage: 1,
-      detailItem:{
-        id: 0,
-        number: "",
-        date: "08.02.2023",
-        whs: '',
-        items: [],
-      },
+
       tableData: [],
       suggestion: [],
 
+      // register the receipt of goods as a document
+      receiptAsDocument: false,
+      inlineFormIsOpen: false,
+
+      detailItem:{
+        Id: 0,
+        Name: "",
+        MnfId: 0,
+        MnfName: "",
+      },
+
+      itemNameSuggestion: [],
+      itemMnfSuggestion: [],
 
       lng: {
         title: "Поступления",
@@ -209,30 +216,24 @@ export default {
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
     onClickFormClose(){
-
+      this.resetDetailItem()
+      this.inlineFormIsOpen = false
     },
     showForm(id){
-      this.resetDetailItem()
 
-      for(let i=0; i< this.productColumns.length; i++){
-        if (this.productColumns[i].field === 'product_name'
-          || this.productColumns[i].field === 'product_manufacturer'
-          || this.productColumns[i].field === "quantity") {
-          this.productColumns[i].readonly = id !== 0
-        }
+      if (this.inlineFormIsOpen === false) {
+        this.inlineFormIsOpen = true
+      } else {
+        this.inlineFormIsOpen = false
       }
-
-      if (id === 0){
-        return
-      }
-      this.getDetailItem(id)
+      console.log(id)
     },
     resetDetailItem(){
       this.detailItem = {
         id: 0,
-        number: '',
-        date: '',
-        items: []
+        Name: '',
+        MnfId: '',
+        MnfName: ''
       }
     },
 
@@ -257,19 +258,6 @@ export default {
         this.fillProductRow(emitRow)
       }
     },
-    // Update suggestions list
-    onUpdateSuggestionTable(emitData){
-      console.log('suggestion update for ' + emitData.key + ' ' + emitData.val)
-      if(emitData.key === "product_name"){
-        this.updateProductsData(emitData)
-        return
-      }
-      if(emitData.key === "product_manufacturer"){
-        this.updateManufacturersData(emitData)
-        return
-      }
-      this.suggestion = []
-    },
 
     // LIST ITEMS METHODS
     // selection page on pagination bar
@@ -290,7 +278,7 @@ export default {
     // List items update
     updateListItems(page){
       let offset = ( page -1 ) * this.limitRows
-      DataProvider.GetReceiptDocs("receipt", page, this.limitRows, offset)
+      DataProvider.GetReceiptDocs("receipt/products", page, this.limitRows, offset)
         .then((response) => {
           this.tableData = response.data.data
           this.countRows = response.data.header.count
@@ -306,10 +294,13 @@ export default {
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
     // Getting product and // fill row data //
-    fillProductRow(row){
-      DataProvider.GetItemReference('products', row.id)
+    fillProductFields(emitData){
+      DataProvider.GetItemReference('products', emitData.key)
         .then((response) => {
-          row.product_manufacturer =response.data.manufacturer.name
+          this.detailItem.Name = response.data.name
+          this.detailItem.MnfId = response.data.manufacturer.id
+          this.detailItem.MnfName = response.data.manufacturer.name
+          this.detailItem.Barcode = !response.data.barcodes[0].name
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
@@ -317,8 +308,7 @@ export default {
     updateProductsData(emitData){
       DataProvider.GetSuggestionReference('products', emitData.val)
         .then((response) => {
-          console.log('updateProductsData: ' + response.data)
-          this.suggestion = response.data
+          this.itemNameSuggestion = response.data
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
@@ -326,8 +316,7 @@ export default {
     updateManufacturersData(emitData){
       DataProvider.GetSuggestionReference('manufacturers', emitData.val)
         .then((response) => {
-          console.log('updateManufacturersData: ' + response.data)
-          this.suggestion = response.data
+          this.itemMnfSuggestion = response.data
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },

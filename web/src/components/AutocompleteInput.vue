@@ -4,9 +4,9 @@
          @keydown.enter = 'onEnter'
          @keydown.down = 'onKeyDown'
          @keydown.up = 'onKeyUp'
-         @input = 'onChange'
          @click = 'onClick'
-         @keyup = 'onKeypress'
+         @input = 'onChange'
+         @keyup = onKeypress
   />
   <div class="dropdown" style="position:relative; min-width: inherit">
     <ul class="dropdown-menu" v-bind:class="{'show':openSuggestion}">
@@ -37,6 +37,7 @@ export default {
     return {
       open: false,
       current: 0,
+      eventTargetValue: ""
     }
   },
 
@@ -89,10 +90,11 @@ export default {
       return this.textValue !== "" &&
         this.matches.length !== 0 &&
         this.open === true;
-    }
+    },
   },
 
   methods: {
+    // Выбор с клавиатуры элемента из списка подсказок
     onEnter() {
       if (this.open) {
         this.textValue = this.matches[this.current].val;
@@ -101,6 +103,17 @@ export default {
       }
       this.open = false;
     },
+    // Выбор мышью элемента из списка подсказок
+    onSelect(index) {
+      if (this.open) {
+        this.textValue = this.matches[index].val;
+        this.idValue = this.matches[index].id;
+        this.$emit('onSelectData', { val:this.matches[index].val, key:this.matches[index].id } )
+      }
+      this.open = false;
+    },
+
+    // Перемещение по списку подсказок
     onKeyUp() {
       console.log('key up')
       if(this.current > 0)
@@ -111,12 +124,12 @@ export default {
       if(this.current < this.matches.length - 1)
         this.current++;
     },
+
     onChange() {
-      console.log('on change')
-      if (this.open === false) {
-        this.open = true;
-        this.current = 0;
-      }
+       if (this.open === false) {
+         this.open = true;
+         this.current = 0;
+       }
     },
     onClick(){
       if (this.open){
@@ -124,26 +137,18 @@ export default {
       }
     },
     onKeypress(event){
-      const val = event.target.value
-      console.log('key press ' + val + ' ' + this.textValue)
-      if (val === ''){
-        return
-      }
-      this.$emit('onUpdateData', {
-          val:val,
-          key:this.propKey
-        }
-      )
-    },
-    onSelect(index) {
-      if (this.open) {
-        this.textValue = this.matches[index].val;
-        this.idValue = this.matches[index].id;
-        this.$emit('onSelectData', { val:this.matches[index].val, key:this.matches[index].id } )
-      }
-      this.open = false;
+       const val = event.target.value
+       console.log('key press ' + val + ' ' + this.textValue)
+       if (val === ''){
+         return
+       }
+       this.$emit('onUpdateData', {
+           val:val,
+           key:this.propKey
+         }
+       )
+     },
 
-    },
     isActive(index) {
       return index === this.current;
     },

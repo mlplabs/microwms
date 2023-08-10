@@ -9,7 +9,7 @@
       <form>
         <input type="hidden" value="{{detailItem.id}}" >
         <div class="mb-3">
-          <label for="inputName" class="form-label">Наименование</label>
+          <label class="form-label">Наименование</label>
           <autocomplete-input
             v-model:prop-suggestions="productsSuggestion"
             v-model:prop-selection-id="detailItem.id"

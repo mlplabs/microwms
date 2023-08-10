@@ -7,6 +7,7 @@ import (
 	app "github.com/mlplabs/app-utils"
 	"github.com/mlplabs/microwms-core/core"
 	"github.com/mlplabs/microwms-core/whs"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -28,6 +29,15 @@ type ReceiptDoc struct {
 	Number string           `json:"number"`
 	Date   string           `json:"date"`
 	Items  []ReceiptDocItem `json:"items"`
+}
+
+type GetReceiptProductsResponse struct {
+	Header struct {
+		Limit  int `json:"limit"`
+		Offset int `json:"offset"`
+		Count  int `json:"count"`
+	} `json:"header"`
+	Data []whs.TurnoversRow `json:"data"`
 }
 
 type ReceiptDocItem struct {
@@ -63,9 +73,11 @@ func (r *ReceiptDoc) ImportData(item *whs.DocItem) {
 
 func (r *ReceiptDoc) ExportData() *whs.DocItem {
 	docItem := whs.DocItem{
-		Id:      int64(r.Id),
-		Number:  r.Number,
-		DocType: 1,
+		Doc: whs.Doc{
+			Id:      int64(r.Id),
+			Number:  r.Number,
+			DocType: 1,
+		},
 	}
 	if strings.Trim(r.Date, " ") == "" {
 		docItem.Date = time.Now().Format("2006-01-02")
@@ -110,6 +122,14 @@ func RegisterReceiptHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers)
 		HandlerFunc:   wHandlers.GetReceiptDocs,
 	})
 	routeItems = append(routeItems, app.Route{
+		Name:          "GetReceiptDocsProducts",
+		Method:        "GET",
+		Pattern:       "/receipt/products",
+		SetHeaderJSON: true,
+		ValidateToken: false,
+		HandlerFunc:   wHandlers.GetReceiptProducts,
+	})
+	routeItems = append(routeItems, app.Route{
 		Name:          "GetReceiptDoc",
 		Method:        "GET",
 		Pattern:       "/receipt/{id}",
@@ -143,6 +163,7 @@ func RegisterReceiptHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers)
 	})
 	return routeItems
 }
+
 func (wh *WrapHttpHandlers) GetReceiptDocs(w http.ResponseWriter, r *http.Request) {
 
 	varOffset := r.URL.Query().Get("o")
@@ -177,7 +198,7 @@ func (wh *WrapHttpHandlers) GetReceiptDocs(w http.ResponseWriter, r *http.Reques
 
 func (wh *WrapHttpHandlers) CreateReceiptDoc(w http.ResponseWriter, r *http.Request) {
 	// читаем данные
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't read body"))
 		return
@@ -265,6 +286,38 @@ func (wh *WrapHttpHandlers) GetReceiptDoc(w http.ResponseWriter, r *http.Request
 	d := new(ReceiptDoc)
 	d.ImportData(doc)
 	app.ResponseJSON(w, http.StatusOK, d)
+}
+
+func (wh *WrapHttpHandlers) GetReceiptProducts(w http.ResponseWriter, r *http.Request) {
+
+	varOffset := r.URL.Query().Get("o")
+	varLimit := r.URL.Query().Get("l")
+
+	offset, err := strconv.Atoi(varOffset)
+	if err != nil {
+		offset = 0
+	}
+	limit, err := strconv.Atoi(varLimit)
+	if err != nil {
+		limit = 0
+	}
+
+	docs, count, err := wh.Storage.GetReceiptItems(offset, limit)
+	if err != nil {
+		app.Log.Warning.Printf("data fetch error, %v", err)
+		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("data fetch error"))
+	}
+
+	response := GetReceiptProductsResponse{}
+
+	response.Data = make([]whs.TurnoversRow, 0)
+
+	response.Header.Limit = limit
+	response.Header.Offset = offset
+	response.Header.Count = count
+	response.Data = docs
+
+	app.ResponseJSON(w, http.StatusOK, response)
 }
 
 func (wh *WrapHttpHandlers) DeleteReceiptDoc(w http.ResponseWriter, r *http.Request) {

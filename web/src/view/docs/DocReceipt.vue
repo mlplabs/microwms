@@ -77,9 +77,9 @@
       <tbody>
       <tr v-for="(item, index) in tableData" :key="index">
         <td class="col_id">{{ item.id }}</td>
-        <td><span>{{ this.getDocType(item.doc_type) }}</span></td>
-        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showForm(item.id)">{{ item.number }}</a></td>
-        <td><a href="#" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showForm(item.id)">{{ item.date }}</a></td>
+        <td><span>{{ item.doc.date }}</span></td>
+        <td><a href="#" @click="showForm(item.product.id)">{{ item.product.name }}</a></td>
+        <td><a href="#" @click="showForm(item.product.manufacturer.id)">{{ item.product.manufacturer.name }}</a></td>
         <td class="col_action">
           <div class="dropdown">
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
@@ -282,6 +282,7 @@ export default {
         .then((response) => {
           this.tableData = response.data.data
           this.countRows = response.data.header.count
+          console.log(this.tableData)
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },

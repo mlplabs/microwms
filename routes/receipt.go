@@ -116,23 +116,16 @@ func RegisterReceiptHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers)
 	routeItems = append(routeItems, app.Route{
 		Name:          "GetReceiptDocs",
 		Method:        "GET",
-		Pattern:       "/receipt",
+		Pattern:       "/receipt/docs",
 		SetHeaderJSON: true,
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.GetReceiptDocs,
 	})
-	routeItems = append(routeItems, app.Route{
-		Name:          "GetReceiptDocsProducts",
-		Method:        "GET",
-		Pattern:       "/receipt/products",
-		SetHeaderJSON: true,
-		ValidateToken: false,
-		HandlerFunc:   wHandlers.GetReceiptProducts,
-	})
+
 	routeItems = append(routeItems, app.Route{
 		Name:          "GetReceiptDoc",
 		Method:        "GET",
-		Pattern:       "/receipt/{id}",
+		Pattern:       "/receipt/docs/{id}",
 		SetHeaderJSON: true,
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.GetReceiptDoc,
@@ -140,7 +133,7 @@ func RegisterReceiptHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers)
 	routeItems = append(routeItems, app.Route{
 		Name:          "CreateReceiptDoc",
 		Method:        "POST",
-		Pattern:       "/receipt",
+		Pattern:       "/receipt/docs",
 		SetHeaderJSON: true,
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.CreateReceiptDoc,
@@ -148,7 +141,7 @@ func RegisterReceiptHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers)
 	routeItems = append(routeItems, app.Route{
 		Name:          "UpdateReceiptDoc",
 		Method:        "PUT",
-		Pattern:       "/receipt",
+		Pattern:       "/receipt/docs",
 		SetHeaderJSON: true,
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.UpdateReceiptDoc,
@@ -156,11 +149,21 @@ func RegisterReceiptHandlers(routeItems app.Routes, wHandlers *WrapHttpHandlers)
 	routeItems = append(routeItems, app.Route{
 		Name:          "DeleteReceiptDoc",
 		Method:        "DELETE",
-		Pattern:       "/receipt/{id}",
+		Pattern:       "/receipt/docs/{id}",
 		SetHeaderJSON: true,
 		ValidateToken: false,
 		HandlerFunc:   wHandlers.DeleteReceiptDoc,
 	})
+
+	routeItems = append(routeItems, app.Route{
+		Name:          "GetReceiptProducts",
+		Method:        "GET",
+		Pattern:       "/receipt/products",
+		SetHeaderJSON: true,
+		ValidateToken: false,
+		HandlerFunc:   wHandlers.GetReceiptProducts,
+	})
+
 	return routeItems
 }
 
@@ -204,14 +207,14 @@ func (wh *WrapHttpHandlers) CreateReceiptDoc(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	data := new(ReceiptDoc)
+	data := new(whs.DocItem)
 	err = json.Unmarshal(body, data)
 	if err != nil {
 		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("can't unmarshal body, %s", err))
 		return
 	}
 
-	id, err := wh.Storage.CreateReceiptDoc(data.ExportData())
+	id, err := wh.Storage.CreateReceiptDoc(data)
 
 	if err != nil {
 		if err, ok := err.(*core.WrapError); !ok {
@@ -288,6 +291,37 @@ func (wh *WrapHttpHandlers) GetReceiptDoc(w http.ResponseWriter, r *http.Request
 	app.ResponseJSON(w, http.StatusOK, d)
 }
 
+func (wh *WrapHttpHandlers) DeleteReceiptDoc(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	if v, ok := vars["id"]; !ok || v == "0" {
+		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
+		return
+	}
+
+	valId, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
+		return
+	}
+
+	m, err := wh.Storage.FindReceiptDocById(int64(valId))
+	if err != nil {
+		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("document not found"))
+		return
+	}
+	resultData, err := wh.Storage.DeleteReceiptDoc(m.Id)
+	if err != nil {
+		app.ResponseERROR(w, http.StatusInternalServerError, fmt.Errorf("item deleting error"))
+		return
+	}
+	app.ResponseJSON(w, http.StatusOK, resultData)
+}
+
+/*
+	Model: only products, without documents
+*/
+
 func (wh *WrapHttpHandlers) GetReceiptProducts(w http.ResponseWriter, r *http.Request) {
 
 	varOffset := r.URL.Query().Get("o")
@@ -318,31 +352,4 @@ func (wh *WrapHttpHandlers) GetReceiptProducts(w http.ResponseWriter, r *http.Re
 	response.Data = docs
 
 	app.ResponseJSON(w, http.StatusOK, response)
-}
-
-func (wh *WrapHttpHandlers) DeleteReceiptDoc(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	if v, ok := vars["id"]; !ok || v == "0" {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid path params"))
-		return
-	}
-
-	valId, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		app.ResponseERROR(w, http.StatusBadRequest, fmt.Errorf("invalid query params"))
-		return
-	}
-
-	m, err := wh.Storage.FindReceiptDocById(int64(valId))
-	if err != nil {
-		app.ResponseERROR(w, http.StatusNotFound, fmt.Errorf("document not found"))
-		return
-	}
-	resultData, err := wh.Storage.DeleteReceiptDoc(m.Id)
-	if err != nil {
-		app.ResponseERROR(w, http.StatusInternalServerError, fmt.Errorf("item deleting error"))
-		return
-	}
-	app.ResponseJSON(w, http.StatusOK, resultData)
 }

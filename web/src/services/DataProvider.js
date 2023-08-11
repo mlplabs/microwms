@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const apiClient = axios.create({
-    baseURL: 'http://microwms.ru/api/v1.0/', //api/v1.0/
+    baseURL: process.env.VUE_APP_API,
     withCredentials: false,
     headers: {
         'Accept': 'application/json',
@@ -59,13 +59,13 @@ export default {
     GetReceiptDoc(refName, id){
         return apiClient.get(`${refName}/${id}`)
     },
-    GetReceiptDocs(refName, page, limit, offset){
+    GetDocuments(refName, page, limit, offset){
         return apiClient.get(`${refName}?l=${limit}&o=${offset}`)
     },
-    StoreReceiptDoc(refName, detailItem){
-        if (detailItem.id === 0) {
-            return apiClient.post(refName,
-                detailItem,
+    StoreDocument(docName, docItem){
+        if (docItem.id === 0) {
+            return apiClient.post(docName,
+                docItem,
                 {
                     headers: {
                         'Content-type': 'application/x-www-form-urlencoded'
@@ -73,8 +73,8 @@ export default {
                 }
             )
         }else {
-            return apiClient.put(refName,
-                detailItem,
+            return apiClient.put(docName,
+                docItem,
                 {
                     headers: {
                         'Content-type': 'application/x-www-form-urlencoded'

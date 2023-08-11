@@ -3,7 +3,7 @@
     <h5>{{lng.title}}</h5>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group me-2">
-        <button type="button" class="btn btn-sm btn-outline-secondary" @click="showForm(0) ">
+        <button type="button" class="btn btn-sm btn-outline-secondary" @click="showForm()">
           <i class="bi bi-plus"></i>
         </button>
       </div>
@@ -14,23 +14,23 @@
     <form class="row g-2" >
       <div class="col-md-3" v-show="receiptAsDocument">
         <label for="inputNumber" class="form-label">Номер</label>
-        <input type="text" class="form-control" id="inputNumber" v-model="detailItem.number" :readonly="detailItem.id !== 0">
+        <input type="text" class="form-control" id="inputNumber" v-model="docItem.number" :readonly="docItem.id !== 0">
       </div>
       <div class="col-md-3" v-show="receiptAsDocument">
         <label for="inputDate" class="form-label">Дата</label>
-        <input type="text" class="form-control" id="inputDate" v-model="detailItem.date" :readonly="detailItem.id !== 0">
+        <input type="text" class="form-control" id="inputDate" v-model="docItem.date" :readonly="docItem.id !== 0">
       </div>
       <div class="col-md-3" v-show="receiptAsDocument">
         <label for="inputWhs" class="form-label">Склад</label>
-        <input type="text" class="form-control" id="inputWhs" v-model="detailItem.whs" :readonly="detailItem.id !== 0">
+        <input type="text" class="form-control" id="inputWhs" v-model="docItem.whs" :readonly="docItem.id !== 0">
       </div>
 
       <div class="col-md-6">
         <label for="inputName" class="form-label">Наименование</label>
         <autocomplete-input
             v-model:prop-suggestions="itemNameSuggestion"
-            v-model:prop-selection-id="detailItem.Id"
-            v-model:prop-selection-val="detailItem.Name"
+            v-model:prop-selection-id="docItem.items[0].product.id"
+            v-model:prop-selection-val="docItem.items[0].product.name"
             @onUpdateData="updateProductsData"
             @onSelectData="fillProductFields"
         ></autocomplete-input>
@@ -39,22 +39,22 @@
         <label for="inputMnf" class="form-label">Производитель</label>
         <autocomplete-input
             v-model:prop-suggestions="itemMnfSuggestion"
-            v-model:prop-selection-id="detailItem.MnfId"
-            v-model:prop-selection-val="detailItem.MnfName"
+            v-model:prop-selection-id="docItem.items[0].product.manufacturer.id"
+            v-model:prop-selection-val="docItem.items[0].product.manufacturer.name"
             @onUpdateData="updateManufacturersData"
         ></autocomplete-input>
       </div>
       <div class="col-md-4">
         <label for="inputNumber" class="form-label">Штрих-код</label>
-        <input type="text" class="form-control" id="inputNumber">
+        <input type="text" class="form-control" id="inputNumber" v-model="docItem.items[0].barcode">
       </div>
       <div class="col-md-4">
         <label for="inputNumber" class="form-label">Ячейка</label>
-        <input type="text" class="form-control" id="inputNumber">
+        <input type="text" class="form-control" id="inputNumber" v-model="docItem.items[0].cell">
       </div>
       <div class="col-md-4">
         <label for="inputNumber" class="form-label">Количество</label>
-        <input type="number" class="form-control" id="inputNumber" min="0">
+        <input type="number" class="form-control" id="inputNumber" min="0" v-model="docItem.items[0].quantity">
       </div>
       <div class="col-md-12 text-end">
         <button type="button" class="btn btn-secondary me-2" @click="onClickFormClose">{{lng.btn_form_close}}</button>
@@ -67,19 +67,18 @@
     <table class="table table-striped table-hover table-bordered">
       <thead>
       <tr>
-        <th scope="col" class="col_head col_id">#</th>
-        <th scope="col" class="col_head">Тип</th>
-        <th scope="col" class="col_head">Номер</th>
         <th scope="col" class="col_head">Дата</th>
+        <th scope="col" class="col_head">Товар</th>
+        <th scope="col" class="col_head">Количество</th>
         <th scope="col" class="col_head col_action">...</th>
       </tr>
       </thead>
       <tbody>
       <tr v-for="(item, index) in tableData" :key="index">
-        <td class="col_id">{{ item.id }}</td>
         <td><span>{{ item.doc.date }}</span></td>
-        <td><a href="#" @click="showForm(item.product.id)">{{ item.product.name }}</a></td>
-        <td><a href="#" @click="showForm(item.product.manufacturer.id)">{{ item.product.manufacturer.name }}</a></td>
+        <td>{{ item.product.name }}<br><small class="text-secondary">{{ item.product.manufacturer.name}} </small></td>
+
+        <td class="col_id">{{ item.quantity }}</td>
         <td class="col_action">
           <div class="dropdown">
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
@@ -121,11 +120,26 @@ export default {
       receiptAsDocument: false,
       inlineFormIsOpen: false,
 
-      detailItem:{
-        Id: 0,
-        Name: "",
-        MnfId: 0,
-        MnfName: "",
+      docItem:{
+        id: 0,
+        number: '',
+        date: '',
+        whs: '',
+        items: [
+          {
+            product:{
+              id: 0,
+              name: '',
+              manufacturer:{
+                id: 0,
+                name: ''
+              }
+            },
+            barcode: '',
+            cell: '',
+            quantity: 0
+          }
+        ]
       },
 
       itemNameSuggestion: [],
@@ -140,63 +154,6 @@ export default {
       },
     }
   },
-  computed:{
-    productColumns(){
-      return [
-        {
-          label: "#",
-          field: "product_id",
-          isKey: true,
-          isNum: true,
-          align: 2
-        },
-        {
-          label: "Наименование",
-          field: "product_name",
-          field_id: "id",
-          isKey: false,
-          suggestion: true,
-          align: 0,
-        },
-        {
-          label: "Производитель",
-          field: "product_manufacturer",
-          isKey: false,
-          suggestion: true,
-          align: 0
-        },
-        {
-          label: "Штрих-код",
-          field: "product_barcode",
-          isKey: false,
-          suggestion: true,
-          align: 0
-        },
-        {
-          label: "Ячейка",
-          field: "cell_name",
-          isKey: false,
-          suggestion: true,
-          align: 0
-        },
-        {
-          label: "Количество",
-          field: "quantity",
-          isKey: false,
-          isNum: true,
-          readonly: false,
-          align: 2
-        },
-        {
-          label: "Действия",
-          field: "actions",
-          isKey: false,
-          align: 1
-        }
-      ]
-    },
-
-  },
   methods:{
     /*
     * List
@@ -206,56 +163,52 @@ export default {
 
     // DETAIL FORM METHODS
     onClickFormStore(){
-      DataProvider.StoreReceiptDoc("receipt", this.detailItem)
+      DataProvider.StoreDocument("receipt/docs", this.docItem)
         .then((response) => {
           const storeId = response.data;
           if (storeId > 0) {
+            this.resetInlineForm()
+            this.inlineFormIsOpen = false
             this.updateListItems(this.currentPage)
           }
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
     onClickFormClose(){
-      this.resetDetailItem()
+      this.resetInlineForm()
       this.inlineFormIsOpen = false
     },
-    showForm(id){
 
+    resetInlineForm(){
+      this.docItem.id = 0
+      this.docItem.number = ''
+      this.docItem.date = ''
+      this.docItem.whs = ''
+      this.docItem.items = [
+            {
+              product:{
+                id: 0,
+                name: '',
+                manufacturer:{
+                  id: 0,
+                  name: ''
+                }
+              },
+              barcode: '',
+              cell: '',
+              quantity: 0
+            }
+      ]
+    },
+
+    showForm(){
       if (this.inlineFormIsOpen === false) {
         this.inlineFormIsOpen = true
       } else {
         this.inlineFormIsOpen = false
       }
-      console.log(id)
-    },
-    resetDetailItem(){
-      this.detailItem = {
-        id: 0,
-        Name: '',
-        MnfId: '',
-        MnfName: ''
-      }
-    },
-
-    onClickTableNewItem(){
-      let newBc = this.detailItem.items.find(item => item.name === "");
-      if (newBc !== undefined){
-        return
-      }
-      this.detailItem.items.push({id: 0, product_name: "", product_manufacturer: "", product_barcode: "", cell:"", quantity: 0})
-    },
-    onClickTableDelRow(idx){
-      console.log('delete ' + idx)
-      this.detailItem.items.splice(idx, 1)
-    },
-    onClickTableRow(eventData){
-      console.log(eventData)
-    },
-
-    // Select suggestion from table in detail form
-    onSelectSuggestionTable(emitRow){
-      if (emitRow.id !== 0) {
-        this.fillProductRow(emitRow)
+      if (this.docItem.items.length === 0){
+        this.docItem.items.push()
       }
     },
 
@@ -265,24 +218,15 @@ export default {
       this.currentPage = eventData.page
       this.updateListItems(eventData.page)
     },
-    getDocType(doc_type){
-      if(doc_type === 1){
-        return "Поступление"
-      }
-      if(doc_type === 2){
-        return "Оприходование"
-      }
-    },
 
     // COMMUNICATIONS METHODS
     // List items update
     updateListItems(page){
       let offset = ( page -1 ) * this.limitRows
-      DataProvider.GetReceiptDocs("receipt/products", page, this.limitRows, offset)
+      DataProvider.GetDocuments("receipt/products", page, this.limitRows, offset)
         .then((response) => {
           this.tableData = response.data.data
           this.countRows = response.data.header.count
-          console.log(this.tableData)
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
@@ -298,10 +242,10 @@ export default {
     fillProductFields(emitData){
       DataProvider.GetItemReference('products', emitData.key)
         .then((response) => {
-          this.detailItem.Name = response.data.name
-          this.detailItem.MnfId = response.data.manufacturer.id
-          this.detailItem.MnfName = response.data.manufacturer.name
-          this.detailItem.Barcode = !response.data.barcodes[0].name
+          this.docItem.items[0].product.name = response.data.name
+          this.docItem.items[0].product.manufacturer.id = response.data.manufacturer.id
+          this.docItem.items[0].product.manufacturer.name = response.data.manufacturer.name
+          this.docItem.items[0].barcode = response.data.barcodes.length > 0 ? response.data.barcodes[0].name: ''
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
@@ -318,17 +262,6 @@ export default {
       DataProvider.GetSuggestionReference('manufacturers', emitData.val)
         .then((response) => {
           this.itemMnfSuggestion = response.data
-        })
-        .catch(error => { DataProvider.ErrorProcessing(error) });
-    },
-    deleteItem(id){
-      DataProvider.DeleteReceiptDoc('receipt', id)
-        .then((response) => {
-          const affRows = response.data;
-          if (affRows !== 1){
-            console.log('delete failed')
-          }
-          this.updateListItems(this.currentPage)
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },

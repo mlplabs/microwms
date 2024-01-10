@@ -7,7 +7,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/joho/godotenv v1.5.1
 	github.com/mlplabs/app-utils v0.0.0-20221215103534-d034b483b7e2
-	github.com/mlplabs/microwms-core v0.0.0-20240110095619-4fe5e5174e8e
+	github.com/mlplabs/microwms-core v0.0.0-20240110110203-a1c8b04fefbc
 )
 
 require (

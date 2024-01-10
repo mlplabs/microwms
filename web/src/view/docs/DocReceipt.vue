@@ -223,6 +223,7 @@ export default {
     // List items update
     updateListItems(page){
       let offset = ( page -1 ) * this.limitRows
+      console.log(process.env.VUE_APP_API)
       DataProvider.GetDocuments("receipt/products", page, this.limitRows, offset)
         .then((response) => {
           this.tableData = response.data.data

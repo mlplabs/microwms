@@ -16,7 +16,7 @@ The source code is in the [/web](https://github.com/mlplabs/microwms/tree/master
 #### Backend
 
 Golang 1.22  
-API documentation [swagger](https://mlplabs.github.io/microwms/docs/swagger/swagger.yaml)
+API documentation [swagger](https://mlplabs.github.io/microwms/docs/api.html)
 
 #### Database
 

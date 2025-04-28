@@ -23,20 +23,8 @@
       </div>
       <div class="col d-flex align-items-start">
         <div>
-          <router-link to="#" class="text-decoration-none fw-bold fs-5">Еще один справочник</router-link>
-          <p></p>
-        </div>
-      </div>
-      <div class="col d-flex align-items-start">
-        <div>
           <router-link to="/refs/whs" class="text-decoration-none fw-bold fs-5">Склады</router-link>
           <p>Склады, места хранения</p>
-        </div>
-      </div>
-      <div class="col d-flex align-items-start">
-        <div>
-          <router-link to="#" class="text-decoration-none fw-bold fs-5">Зоны</router-link>
-          <p>Зоны склада</p>
         </div>
       </div>
       <div class="col d-flex align-items-start">

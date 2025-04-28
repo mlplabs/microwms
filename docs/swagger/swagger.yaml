@@ -1,0 +1,706 @@
+definitions:
+  barcodes.Barcode:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      owner_id:
+        description: ID владельца ШК
+        type: integer
+      owner_ref:
+        description: Таблица владельца
+        type: string
+      type:
+        description: Тип ШК
+        type: integer
+    type: object
+  barcodes.Type:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  manufacturers.Manufacturer:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  products.Product:
+    properties:
+      id:
+        type: integer
+      item_number:
+        type: string
+      manufacturer_id:
+        type: string
+      name:
+        type: string
+    type: object
+  response.List:
+    properties:
+      count:
+        type: integer
+      data: {}
+    type: object
+  response.Pagination:
+    properties:
+      count:
+        type: integer
+      data: {}
+      limit:
+        type: integer
+      offset:
+        type: integer
+    type: object
+  response.PlainData:
+    properties:
+      data: {}
+    type: object
+  users.User:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: WMS API
+  version: "1.0"
+paths:
+  /barcodes:
+    get:
+      parameters:
+      - description: offset
+        in: query
+        name: o
+        type: integer
+      - description: limit
+        in: query
+        name: l
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Pagination'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/barcodes.Barcode'
+                  type: array
+              type: object
+      summary: get barcodes list
+      tags:
+      - barcodes
+    post:
+      parameters:
+      - description: barcode data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/barcodes.Barcode'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      summary: create barcode
+      tags:
+      - barcodes
+  /barcodes/{itemID}:
+    delete:
+      parameters:
+      - description: barcode ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: delete barcode by ID
+      tags:
+      - barcodes
+    get:
+      parameters:
+      - description: barcode ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  $ref: '#/definitions/barcodes.Barcode'
+              type: object
+      summary: get barcode by ID
+      tags:
+      - barcodes
+    put:
+      parameters:
+      - description: barcode ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      - description: barcode data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/barcodes.Barcode'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      summary: update barcode
+      tags:
+      - barcodes
+  /barcodes/{ownerRef}/{ownerID}:
+    get:
+      parameters:
+      - description: offset
+        in: query
+        name: o
+        type: integer
+      - description: limit
+        in: query
+        name: l
+        type: integer
+      - description: owner table
+        in: path
+        name: ownerRef
+        required: true
+        type: string
+      - description: owner ID
+        in: path
+        name: ownerID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Pagination'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/barcodes.Barcode'
+                  type: array
+              type: object
+      summary: get barcodes list by owner
+      tags:
+      - barcodes
+  /enum/barcodes/types:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.List'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/barcodes.Type'
+                  type: array
+              type: object
+      summary: enum barcode types
+      tags:
+      - barcodes
+  /manufacturers:
+    get:
+      parameters:
+      - description: offset
+        in: query
+        name: o
+        type: integer
+      - description: limit
+        in: query
+        name: l
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Pagination'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/manufacturers.Manufacturer'
+                  type: array
+              type: object
+      summary: get manufacturers list
+      tags:
+      - manufacturers
+    post:
+      parameters:
+      - description: manufacturer data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/manufacturers.Manufacturer'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      summary: create manufacturer
+      tags:
+      - manufacturers
+  /manufacturers/{itemID}:
+    delete:
+      parameters:
+      - description: manufacturer ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: delete manufacturer by ID
+      tags:
+      - manufacturers
+    get:
+      parameters:
+      - description: manufacturer ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  $ref: '#/definitions/manufacturers.Manufacturer'
+              type: object
+      summary: get manufacturer by ID
+      tags:
+      - manufacturers
+    put:
+      parameters:
+      - description: manufacturer ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      - description: manufacturer data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/manufacturers.Manufacturer'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      summary: update manufacturer
+      tags:
+      - manufacturers
+  /products:
+    get:
+      parameters:
+      - description: offset
+        in: query
+        name: o
+        type: integer
+      - description: limit
+        in: query
+        name: l
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Pagination'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/products.Product'
+                  type: array
+              type: object
+      summary: get products list
+      tags:
+      - products
+    post:
+      parameters:
+      - description: product data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/products.Product'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      summary: create product
+      tags:
+      - products
+  /products/{itemID}:
+    delete:
+      parameters:
+      - description: product ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: delete product by ID
+      tags:
+      - products
+    get:
+      parameters:
+      - description: user ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  $ref: '#/definitions/products.Product'
+              type: object
+      summary: get product by ID
+      tags:
+      - products
+    put:
+      parameters:
+      - description: product ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      - description: product data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/products.Product'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      summary: update product
+      tags:
+      - products
+  /products/find/barcode/{name}:
+    get:
+      parameters:
+      - description: barcode name
+        in: path
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Pagination'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/products.Product'
+                  type: array
+              type: object
+      summary: find products by barcode
+      tags:
+      - products
+  /products/find/name/{name}:
+    get:
+      parameters:
+      - description: product name
+        in: path
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Pagination'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/products.Product'
+                  type: array
+              type: object
+      summary: find products by name
+      tags:
+      - products
+  /suggestion/barcodes/{text}:
+    get:
+      parameters:
+      - description: text for suggestion
+        in: path
+        name: text
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.List'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/barcodes.Barcode'
+                  type: array
+              type: object
+      summary: get barcodes suggestion
+      tags:
+      - barcodes
+  /suggestion/manufacturers/{text}:
+    get:
+      parameters:
+      - description: text for suggestion
+        in: path
+        name: text
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.List'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/manufacturers.Manufacturer'
+                  type: array
+              type: object
+      summary: get manufacturers suggestion
+      tags:
+      - manufacturers
+  /suggestion/products/{text}:
+    get:
+      parameters:
+      - description: text for suggestion
+        in: path
+        name: text
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.List'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/products.Product'
+                  type: array
+              type: object
+      summary: get products suggestion
+      tags:
+      - products
+  /suggestion/users/{text}:
+    get:
+      parameters:
+      - description: text for suggestion
+        in: path
+        name: text
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.List'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/users.User'
+                  type: array
+              type: object
+      summary: get users suggestion
+      tags:
+      - users
+  /users:
+    get:
+      parameters:
+      - description: offset
+        in: query
+        name: o
+        type: integer
+      - description: limit
+        in: query
+        name: l
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Pagination'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/users.User'
+                  type: array
+              type: object
+      summary: get users list
+      tags:
+      - users
+    post:
+      parameters:
+      - description: user data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/users.User'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      summary: create user
+      tags:
+      - users
+  /users/{itemID}:
+    delete:
+      parameters:
+      - description: user ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: delete user by ID
+      tags:
+      - users
+    get:
+      parameters:
+      - description: user ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  $ref: '#/definitions/users.User'
+              type: object
+      summary: get user by ID
+      tags:
+      - users
+    put:
+      parameters:
+      - description: user ID
+        in: path
+        name: itemID
+        required: true
+        type: integer
+      - description: user data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/users.User'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.PlainData'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      summary: update user
+      tags:
+      - users
+swagger: "2.0"

@@ -21,7 +21,7 @@ export default {
                 }
             )
         }else {
-            return apiClient.put(refName,
+            return apiClient.put(`${refName}/${detailItem.id}`,
                 detailItem,
                 {
                     headers: {
@@ -32,8 +32,8 @@ export default {
         }
     },
 
-    GetItemsReference(refName, page, limit, offset){
-        return apiClient.get(`${refName}?l=${limit}&o=${offset}`)
+    GetItemsReference(refName, page, limit, offset, search=''){
+        return apiClient.get(`${refName}?l=${limit}&o=${offset}&s=${search}`)
     },
 
     GetItemReference(refName, id){
@@ -90,8 +90,8 @@ export default {
     GetEnum(enumName){
         return apiClient.get(`enum/${enumName}`)
     },
-    GetReport(reportName, id){
-        return apiClient.get(`reports/${reportName}/item/${id}`)
+    GetReport(reportName){
+        return apiClient.get(`reports/${reportName}`)
     },
 
     ErrorProcessing(error){

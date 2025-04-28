@@ -9,30 +9,33 @@
       <form>
         <input type="hidden" value="{{detailItem.id}}" >
         <div class="mb-3">
-          <label class="form-label">Наименование</label>
           <autocomplete-input
             v-model:prop-suggestions="productsSuggestion"
-            v-model:prop-selection-id="detailItem.id"
             v-model:prop-selection-val="detailItem.name"
+            v-model:prop-placeholder="lng.label_name"
             @onUpdateData="updateProductsData">
           </autocomplete-input>
 
           <!-- div id="nameHelp" class="form-text">We'll never share your email with anyone else.</div-->
         </div>
         <div class="row mb-3">
-          <div class="col-md-8">
-            <label for="inputMnf" class="form-label">Производитель</label>
+          <div class="col-md-8 col-6">
             <autocomplete-input
               v-model:prop-suggestions="manufacturersSuggestion"
               v-model:prop-selection-id="detailItem.manufacturer.id"
               v-model:prop-selection-val="detailItem.manufacturer.name"
+              v-model:prop-placeholder="lng.label_manufacturer"
               @onUpdateData="updateManufacturersData">
             </autocomplete-input>
           </div>
 
-          <div class="col-md-4">
-            <label for="inputItemNumber" class="form-label">Артикул</label>
-            <input type="text" class="form-control" id="inputItemNumber" v-model="detailItem.item_number">
+          <div class="col-md-4 col-6">
+            <input type="text" class="form-control" id="inputItemNumber" v-model="detailItem.item_number" :placeholder="lng.label_item_number">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md">
+            <input class="form-control tags" data-role="tagsinput" type="text" id="inputTags" v-model="detailItem.tags" :placeholder="lng.label_tags">
           </div>
         </div>
         <div class="mb-3">
@@ -77,16 +80,11 @@ export default {
           id: 0,
           name: ''
         },
+        tags: "",
         barcodes:[]
       },
       barcodeTypes:[],
       barcodesColumns:[
-        {
-          label: "#",
-          field: "id",
-          isKey: true,
-          align: 2
-        },
         {
           label: "Штрих-код",
           field: "name",
@@ -111,6 +109,10 @@ export default {
       productsSuggestion: [],
       manufacturersSuggestion: [],
       lng: {
+        label_name: "Наименование",
+        label_manufacturer: "Производитель",
+        label_item_number: "Артикул",
+        label_tags: "Тэги",
         title_form_create: "Создание товара",
         title_form_edit: "Редактирование товара",
         btn_form_close: "Закрыть",
@@ -131,7 +133,11 @@ export default {
     onDeleteBarcodeItem(emitData){
       console.log('del barcode ' + emitData)
       let idx = this.detailItem.barcodes.findIndex(item => item.id === emitData.id);
-      this.deleteBarcodeItem(emitData.id, idx)
+      if (emitData.id != 0) {
+        this.deleteBarcodeItem(emitData.id, idx)
+      }else {
+        this.detailItem.barcodes.splice(idx, 1)
+      }
     },
 
     deleteBarcodeItem(id, idx){
@@ -141,7 +147,7 @@ export default {
           if (affRows !== 1){
             console.log('delete failed')
           }
-          // удалим из списка, когда из бвзы удалим
+          // удалим из списка, когда из базы удалим
           this.detailItem.barcodes.splice(idx, 1)
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
@@ -150,19 +156,21 @@ export default {
     getDetailItem(id){
       DataProvider.GetItemReference('products', id)
         .then((response) => {
-          this.detailItem = response.data
+           this.detailItem = response.data.data
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
     storeItem(){
       DataProvider.StoreItemReference('products', this.detailItem)
         .then((response) => {
-          const storeId = response.data;
+          const storeId = response.data.data;
           if (storeId > 0) {
             this.$emit('onUpdateData', {storeId} )
           }
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
+
+      this.resetDetailItem()
     },
     closeDetailForm(){
     },
@@ -170,7 +178,7 @@ export default {
     updateProductsData(emitData){
       DataProvider.GetSuggestionReference('products', emitData.val)
         .then((response) => {
-          this.productsSuggestion = response.data
+          this.productsSuggestion = response.data.data
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
@@ -178,15 +186,16 @@ export default {
     updateManufacturersData(emitData){
       DataProvider.GetSuggestionReference('manufacturers', emitData.val)
         .then((response) => {
-          this.manufacturersSuggestion = response.data
+          this.manufacturersSuggestion = response.data.data
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
 
     getEnumBarcodeType(){
-      DataProvider.GetEnum('barcode_type')
+      DataProvider.GetEnum('barcodes/types')
         .then((response) => {
-          this.barcodeTypes = response.data
+          console.log(response)
+          this.barcodeTypes = response.data.data
           this.updateBarcodeColumn()
         })
         .catch(error => { this.errorProc(error) });
@@ -198,6 +207,21 @@ export default {
           this.barcodesColumns[i].values = this.barcodeTypes
         }
       }
+    },
+    resetDetailItem(){
+      this.detailItem = {
+        id: 0,
+        name: '',
+        item_number: '',
+        manufacturer: {id: 0, name: ''},
+        barcodes: [],
+      }
+      this.productsSuggestion = []
+      this.manufacturersSuggestion = []
+
+      if (this.barcodeTypes?.length === 0){
+        this.getEnumBarcodeType()
+      }
     }
 
   },
@@ -208,19 +232,7 @@ export default {
     propProductId(val, oldVal) {
       if (val !== oldVal) {
         // reset
-        this.detailItem = {
-          id: 0,
-          name: '',
-          item_number: '',
-          manufacturer: {id: 0, name: ''},
-          barcodes: [],
-        }
-        this.productsSuggestion = []
-        this.manufacturersSuggestion = []
-
-        if (this.barcodeTypes?.length === 0){
-          this.getEnumBarcodeType()
-        }
+        this.resetDetailItem()
         if (val !== 0)
           this.getDetailItem(val)
       }

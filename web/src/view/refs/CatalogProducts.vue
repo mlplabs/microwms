@@ -22,7 +22,7 @@
     <table class="table table-striped table-hover table-bordered">
       <thead>
       <tr>
-        <th scope="col" class="col_head col_id">#</th>
+        <!-- th scope="col" class="col_head col_id">#</th -->
         <th scope="col" class="col_head">Наименование</th>
         <th scope="col" class="col_head">Артикул</th>
         <th scope="col" class="col_head">Производитель</th>
@@ -31,7 +31,7 @@
       </thead>
       <tbody>
       <tr v-for="(item, index) in tableData" :key="index">
-        <td class="col_id">{{ item.id }}</td>
+        <!-- td class="col_id">{{ item.id }}</td -->
         <td><a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.name }}</a></td>
         <td>{{ item.item_number }}</td>
         <td>{{ item.manufacturer.name }}</td>
@@ -60,6 +60,7 @@ import DataProvider from "@/services/DataProvider";
 import PaginationBar from "@/components/PaginationBar";
 import ProductForm from "@/view/refs/forms/ProductForm";
 import router from "@/router";
+import {inject} from "vue";
 
 export default {
   name: "CatalogProducts",
@@ -91,10 +92,10 @@ export default {
 
     updateItemsOnPage(page){
       let offset = ( page -1 ) * this.limitRows
-      DataProvider.GetItemsReference(this.refName, page, this.limitRows, offset)
+      DataProvider.GetItemsReference(this.refName, page, this.limitRows, offset, this.globalSearch)
         .then((response) => {
           this.tableData = response.data.data
-          this.countRows = response.data.header.count
+          this.countRows = response.data.count
         })
         .catch(error => { DataProvider.ErrorProcessing(error) });
     },
@@ -124,6 +125,15 @@ export default {
   },
   mounted() {
     this.updateItemsOnPage(this.currentPage)
+  },
+  setup() {
+    const globalSearch = inject('global_search')
+    return { globalSearch }
+  },
+  watch:{
+    globalSearch() {
+      this.updateItemsOnPage(this.currentPage)
+    }
   }
 }
 </script>

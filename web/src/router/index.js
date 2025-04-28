@@ -12,8 +12,8 @@ import DocShipment from "@/view/docs/DocShipment";
 import DocReceipt from "@/view/docs/DocReceipt";
 import HardwarePrinters from "@/view/hardware/preference/HardwarePrinters";
 import CatalogUsers from "@/view/refs/CatalogUsers";
-import RemainingProducts from "@/view/reports/RemainingProducts"
 import HistoryProducts from "@/view/reports/HistoryProducts"
+import StockProducts from "@/view/reports/StockProducts.vue";
 
 const routes = [
     {
@@ -72,10 +72,9 @@ const routes = [
         component: ReportsView
     },
     {
-        path: '/reports/remaining/:propProductId',
-        name: 'remaining',
-        component: RemainingProducts,
-        props: castRouteParams
+        path: '/reports/stock',
+        name: 'stock',
+        component: StockProducts,
     },
     {
         path: '/reports/history/:propProductId',

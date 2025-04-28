@@ -1,12 +1,11 @@
 <template>
   <div>
-  <input class="form-control" type="text" :id="propInputId" v-model="textValue" :readonly="propReadonly"
+  <input class="form-control" type="text" :id="propInputId" v-model="textValue" :readonly="propReadonly" :placeholder="propPlaceholder"
          @keydown.enter = 'onEnter'
          @keydown.down = 'onKeyDown'
          @keydown.up = 'onKeyUp'
          @click = 'onClick'
          @input = 'onChange'
-         @keyup = onKeypress
   />
   <div class="dropdown" style="position:relative; min-width: inherit">
     <ul class="dropdown-menu" v-bind:class="{'show':openSuggestion}">
@@ -17,8 +16,6 @@
   </div>
   </div>
 </template>
-
-
 <script>
 /*
   AutocompleteInput component
@@ -60,7 +57,11 @@ export default {
     },
     propInputId:{
       type: String
+    },
+    propPlaceholder:{
+      type: String
     }
+
   },
   computed: {
     textValue:{
@@ -130,25 +131,20 @@ export default {
          this.open = true;
          this.current = 0;
        }
+      if (this.textValue === ''){
+        return
+      }
+      this.$emit('onUpdateData', {
+            val:this.textValue,
+            key:this.propKey
+          }
+      )
     },
     onClick(){
       if (this.open){
         this.open = false
       }
     },
-    onKeypress(event){
-       const val = event.target.value
-       console.log('key press ' + val + ' ' + this.textValue)
-       if (val === ''){
-         return
-       }
-       this.$emit('onUpdateData', {
-           val:val,
-           key:this.propKey
-         }
-       )
-     },
-
     isActive(index) {
       return index === this.current;
     },

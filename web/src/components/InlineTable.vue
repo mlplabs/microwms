@@ -35,7 +35,7 @@
 
               <!-- select - if values > 0 -->
               <select class="form-select" v-if="col.values !== undefined && col.values.length > 0" v-model="row[col.field]">
-                <option v-for="(op, h) in col.values" :key="h" :value="op.key">{{op.val}}</option>
+                <option v-for="(op, h) in col.values" :key="h" :value="op.id">{{op.name}}</option>
               </select>
 
               <!-- suggest - if suggestion == true -->
@@ -63,7 +63,7 @@
                   <i class="bi bi-three-dots-vertical"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li v-if="!isReadOnly"><a class="dropdown-item" href="#" @click.prevent="$emit('onRowDelete', row)">Удалить {{j}}</a></li>
+                  <li v-if="!isReadOnly"><a class="dropdown-item" href="#" @click.prevent="$emit('onRowDelete', row)">Удалить {{row['name']}}</a></li>
                   <li><a class="dropdown-item" href="#">Another action {{row.id}}</a></li>
                   <li><a class="dropdown-item" href="#">Something else here</a></li>
                 </ul>

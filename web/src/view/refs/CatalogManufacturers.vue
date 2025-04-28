@@ -13,11 +13,10 @@
 
             <form>
               <div class="mb-3">
-                <label for="inputMnf" class="form-label">Наименование</label>
                 <autocomplete-input
                   v-model:prop-suggestions="manufacturersSuggestion"
-                  v-model:prop-selection-id="detailItem.id"
                   v-model:prop-selection-val="detailItem.name"
+                  v-model:prop-placeholder="lng.label_name"
                   @onUpdateData="updateManufacturersData">
                 </autocomplete-input>
               </div>
@@ -34,7 +33,7 @@
   </div>
 
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h5>{{ lng.title }}</h5>
+    <h5>{{ lng.title }} {{globalSearch}}</h5>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group me-2">
         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailForm"  @click="showDetailForm(0) ">
@@ -49,14 +48,14 @@
     <table class="table table-striped table-hover table-bordered">
       <thead>
       <tr>
-        <th scope="col" class="col_head col_id">#</th>
+        <!-- th scope="col" class="col_head col_id">#</th -->
         <th scope="col" class="col_head">Наименование</th>
         <th scope="col" class="col_head col_action">...</th>
       </tr>
       </thead>
       <tbody>
       <tr v-for="(item, index) in tableData" :key="index">
-        <td class="col_id">{{ item.id }}</td>
+        <!-- td class="col_id">{{ item.id }}</td -->
         <td><a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#detailForm" @click="showDetailForm(item.id)">{{ item.name }}</a></td>
         <td class="col_action">
           <div class="dropdown">
@@ -78,6 +77,7 @@
 </template>
 
 <script>
+import { inject } from 'vue'
 import DataProvider from "@/services/DataProvider";
 import PaginationBar from "@/components/PaginationBar";
 import AutocompleteInput from "@/components/AutocompleteInput";
@@ -122,6 +122,7 @@ export default {
         btn_list_create: "Новый производитель",
         btn_form_close: "Закрыть",
         btn_form_store: "Сохранить",
+        label_name: "Наименование",
       },
     }
   },
@@ -151,10 +152,10 @@ export default {
 
     updateItemsOnPage(page){
       let offset = ( page -1 ) * this.limitRows
-      DataProvider.GetItemsReference(this.refName, page, this.limitRows, offset)
+      DataProvider.GetItemsReference(this.refName, page, this.limitRows, offset, this.globalSearch)
         .then((response) => {
           this.tableData = response.data.data
-          this.countRows = response.data.header.count
+          this.countRows = response.data.count
         })
         .catch(error => { this.errorProc(error) });
     },
@@ -162,7 +163,7 @@ export default {
     getDetailItem(id){
       DataProvider.GetItemReference(this.refName, id)
         .then((response) => {
-          this.detailItem = response.data
+          this.detailItem = response.data.data
         })
         .catch(error => { this.errorProc(error) });
     },
@@ -170,7 +171,7 @@ export default {
     storeItem(){
       DataProvider.StoreItemReference(this.refName, this.detailItem)
         .then((response) => {
-          const storeId = response.data;
+          const storeId = response.data.data;
           if (storeId > 0) {
             this.updateItemsOnPage(this.currentPage)
           }
@@ -193,7 +194,7 @@ export default {
     updateManufacturersData(emitData){
       DataProvider.GetSuggestionReference(this.refName, emitData.val)
         .then((response) => {
-          this.manufacturersSuggestion = response.data
+          this.manufacturersSuggestion = response.data.data
         })
         .catch(error => { this.errorProc(error) });
     },
@@ -218,6 +219,16 @@ export default {
   },
   mounted() {
     this.updateItemsOnPage(this.currentPage)
+  },
+  setup() {
+    const globalSearch = inject('global_search')
+    return { globalSearch }
+  },
+  watch:{
+    globalSearch(newMsg, oldMsg) {
+      console.log('old :'+ oldMsg + ', new:' + newMsg)
+      this.updateItemsOnPage(this.currentPage)
+    }
   }
 }
 </script>

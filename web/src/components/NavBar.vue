@@ -23,11 +23,11 @@
             <a class="nav-link dropdown-toggle" href="#" id="dropdown05" data-bs-toggle="dropdown" aria-expanded="false">{{ lng.label_navigation }}</a>
             <ul class="dropdown-menu" aria-labelledby="dropdown05">
               <li><router-link to="/refs" class="dropdown-item">Справочники</router-link></li>
-              <li><router-link to="/docs/receipt" class="dropdown-item">Поступления</router-link></li>
-              <li><router-link to="/docs/shipment" class="dropdown-item">Отгрузки</router-link></li>
+              <!-- li><router-link to="/docs/receipt" class="dropdown-item">Поступления</router-link></li>
+              <li><router-link to="/docs/shipment" class="dropdown-item">Отгрузки</router-link></li -->
               <li class="dropdown-divider"></li>
-              <li><router-link class="dropdown-item" to="/reports/remaining/0" href="#">Остатки товаров</router-link></li>
-              <li><router-link class="dropdown-item" to="/reports/history/0" href="#">Движение товара</router-link></li>
+              <li><router-link class="dropdown-item" to="/reports/stock" href="#">Остатки товаров</router-link></li>
+              <!-- li><router-link class="dropdown-item" to="/reports/history/0" href="#">Движение товара</router-link></li -->
               <li class="dropdown-divider"></li>
               <li><router-link to="/props" class="dropdown-item">Настройки</router-link></li>
               <!--
@@ -39,7 +39,7 @@
           </li>
         </ul>
         <form>
-          <input class="form-control" type="text" :placeholder="lng.label_search" aria-label="Search">
+          <input class="form-control" type="text" :placeholder="lng.label_search" aria-label="Search" @input="onInputSearch">
         </form>
       </div>
     </div>
@@ -55,6 +55,12 @@ export default {
         label_navigation: "Навигация",
         label_search: "Поиск"
       }
+    }
+  },
+  methods: {
+    onInputSearch(event){
+      //this.$root.$emit('onGlobalSearch', event.target.values)
+      this.$emit('onGlobalSearch', event.target.value)
     }
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-  <nav-bar />
+  <nav-bar @on-global-search="onNavGlobalSearch"/>
   <div class="container-fluid">
     <div class="row">
       <!-- side-bar / -->
@@ -12,11 +12,22 @@
   </div>
 </template>
 <script>
+import {ref, provide} from 'vue'
 import NavBar from "@/components/NavBar";
 //import SideBar from "@/components/SideBar";
+const message = ref('')
+
 export default {
   name: 'App',
   components: {NavBar},
+  methods:{
+    onNavGlobalSearch(emitData){
+      message.value = emitData
+    }
+  },
+  setup() {
+    provide('global_search', message)
+  }
 }
 </script>
 

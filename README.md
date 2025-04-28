@@ -2,7 +2,7 @@
 A simple and small WMS (Warehouse Management System)
 
 
-Demo (master deploy): [http://microwms.ru/demo](http://microwms.ru/demo)
+Demo (master deploy): in development
 
 #### Platform
 
@@ -15,11 +15,11 @@ The source code is in the [/web](https://github.com/mlplabs/microwms/tree/master
 
 #### Backend
 
-Golang 1.18  
-API documentation (in progress) [swagger](https://mlplabs.github.io/microwms/api)
+Golang 1.22  
+API documentation [swagger](https://mlplabs.github.io/microwms/docs/swagger/swagger.yaml)
 
 #### Database
 
 Postgresql 12 and above  
-Database dump [see core package](https://github.com/mlplabs/microwms-core)
+Database dump [see migrations](https://github.com/mlplabs/microwms/migrations)
 

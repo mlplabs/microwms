@@ -16,10 +16,10 @@ The source code is in the [/web](https://github.com/mlplabs/microwms/tree/master
 #### Backend
 
 Golang 1.22  
-API documentation [swagger](https://mlplabs.github.io/microwms/docs/api.html)
+API documentation [swagger](https://mlplabs.github.io/microwms/api)
 
 #### Database
 
 Postgresql 12 and above  
-Database dump [see migrations](https://github.com/mlplabs/microwms/migrations)
+Database dump [see migrations](https://github.com/mlplabs/microwms/tree/master/migrations)
 

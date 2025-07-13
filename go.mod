@@ -4,7 +4,7 @@ go 1.22
 
 replace (
 	github.com/mlplabs/app-utils => github.com/mlplabs/app-utils v0.0.7002
-	github.com/mlplabs/mwms-core => github.com/mlplabs/mwms-core v0.0.12007
+	github.com/mlplabs/mwms-core => github.com/mlplabs/mwms-core v0.0.12008
 )
 
 require (

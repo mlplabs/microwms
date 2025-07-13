@@ -8,11 +8,11 @@ import (
 const ownerRefProducts = "products"
 
 func (s *WhsService) GetProductById(ctx context.Context, productId int64) (*model.Product, error) {
-	product, err := s.productsCatalog.GetById(ctx, productId)
+	product, err := s.storage.GetProductById(ctx, productId)
 	if err != nil {
 		return nil, err
 	}
-	barcodes, err := s.barcodesCatalog.FindByOwnerId(ctx, productId, ownerRefProducts)
+	barcodes, err := s.storage.FindBarcodesByOwnerId(ctx, productId, ownerRefProducts)
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func (s *WhsService) GetProductById(ctx context.Context, productId int64) (*mode
 }
 
 func (s *WhsService) GetProducts(ctx context.Context, offset int, limit int, search string) ([]model.Product, int64, error) {
-	return s.productsCatalog.GetItems(ctx, offset, limit, search)
+	return s.storage.GetProductsItems(ctx, offset, limit, search)
 }
 func (s *WhsService) CreateProduct(ctx context.Context, product *model.Product) (int64, error) {
 	if product.Manufacturer.Name != "" {
@@ -34,13 +34,13 @@ func (s *WhsService) CreateProduct(ctx context.Context, product *model.Product) 
 		product.Manufacturer = model.Manufacturer{}
 	}
 
-	newItemId, err := s.productsCatalog.Create(ctx, product)
+	newItemId, err := s.storage.CreateProduct(ctx, product)
 	if err != nil {
 		return 0, err
 	}
 
 	if len(product.Barcodes) > 0 {
-		err = s.UpdateBarcodesByOwner(ctx, product.Barcodes, newItemId, ownerRefProducts)
+		err = s.UpdateBarcodesByOwner(ctx, product.Barcodes, newItemId, ownerRefProducts) // TODO: !!!
 		if err != nil {
 			return 0, err
 		}
@@ -60,7 +60,7 @@ func (s *WhsService) UpdateProduct(ctx context.Context, product *model.Product) 
 	}
 
 	if len(product.Barcodes) > 0 {
-		bcItems, err := s.barcodesCatalog.FindByOwnerId(ctx, product.Id, ownerRefProducts)
+		bcItems, err := s.storage.FindBarcodesByOwnerId(ctx, product.Id, ownerRefProducts)
 		if err != nil {
 			return 0, err
 		}
@@ -71,7 +71,7 @@ func (s *WhsService) UpdateProduct(ctx context.Context, product *model.Product) 
 
 		for j := range product.Barcodes {
 			if _, ok := bcItemsMap[product.Barcodes[j].Name]; !ok {
-				_, err = s.barcodesCatalog.Create(ctx, &model.Barcode{
+				_, err = s.storage.CreateBarcode(ctx, &model.Barcode{
 					Name:     product.Barcodes[j].Name,
 					Type:     product.Barcodes[j].Type,
 					OwnerId:  product.Id,
@@ -88,23 +88,23 @@ func (s *WhsService) UpdateProduct(ctx context.Context, product *model.Product) 
 		}
 	}
 
-	return s.productsCatalog.Update(ctx, product)
+	return s.storage.UpdateProduct(ctx, product)
 }
 
 func (s *WhsService) DeleteProduct(ctx context.Context, productId int64) error {
-	_, err := s.productsCatalog.GetById(ctx, productId)
+	_, err := s.storage.GetProductById(ctx, productId)
 	if err != nil {
 		return err
 	}
-	return s.productsCatalog.Delete(ctx, productId)
+	return s.storage.DeleteProduct(ctx, productId)
 }
 
 func (s *WhsService) FindProductsByName(ctx context.Context, name string) ([]model.Product, error) {
-	return s.productsCatalog.FindByName(ctx, name)
+	return s.storage.FindProductsByName(ctx, name)
 }
 func (s *WhsService) FindProductsByBarcode(ctx context.Context, name string) ([]model.Product, error) {
-	return s.productsCatalog.FindByBarcode(ctx, name)
+	return s.storage.FindProductsByBarcode(ctx, name)
 }
 func (s *WhsService) GetProductsSuggestion(ctx context.Context, text string, limit int) ([]model.Suggestion, error) {
-	return s.productsCatalog.Suggest(ctx, text, limit)
+	return s.storage.ProductsSuggest(ctx, text, limit)
 }

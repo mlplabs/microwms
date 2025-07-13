@@ -6,29 +6,29 @@ import (
 )
 
 func (s *WhsService) GetUserById(ctx context.Context, userId int64) (*model.User, error) {
-	return s.usersCatalog.GetById(ctx, userId)
+	return s.storage.GetUserById(ctx, userId)
 }
 
 func (s *WhsService) GetUsers(ctx context.Context, offset int, limit int) ([]model.User, int64, error) {
-	return s.usersCatalog.GetItems(ctx, offset, limit)
+	return s.storage.GetUsersItems(ctx, offset, limit)
 }
 
 func (s *WhsService) CreateUser(ctx context.Context, user *model.User) (int64, error) {
-	return s.usersCatalog.Create(ctx, user)
+	return s.storage.CreateUser(ctx, user)
 }
 
 func (s *WhsService) UpdateUser(ctx context.Context, user *model.User) (int64, error) {
-	return s.usersCatalog.Update(ctx, user)
+	return s.storage.UpdateUser(ctx, user)
 }
 
 func (s *WhsService) DeleteUser(ctx context.Context, userId int64) error {
-	_, err := s.usersCatalog.GetById(ctx, userId)
+	_, err := s.storage.GetUserById(ctx, userId)
 	if err != nil {
 		return err
 	}
-	return s.usersCatalog.Delete(ctx, userId)
+	return s.storage.DeleteUser(ctx, userId)
 }
 
 func (s *WhsService) GetUserSuggestion(ctx context.Context, text string, limit int) ([]model.Suggestion, error) {
-	return s.usersCatalog.Suggest(ctx, text, limit)
+	return s.storage.UsersSuggest(ctx, text, limit)
 }

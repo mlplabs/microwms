@@ -39,8 +39,8 @@ github.com/mailru/easyjson v0.7.6 h1:8yTIVnZgCoiM1TgqoeTl+LfU5Jg6/xL3QhGQnimLYnA
 github.com/mailru/easyjson v0.7.6/go.mod h1:xzfreul335JAWq5oZzymOObrkdz5UnU4kGfJJLY9Nlc=
 github.com/mlplabs/app-utils v0.0.7002 h1:SyUu2CxHuzt5aHFb3pHoINVd3D8EZNaInjHFJ6lTrj8=
 github.com/mlplabs/app-utils v0.0.7002/go.mod h1:fA/sXPRsdqpGrIrgbGZo4W1wCn7JAAQrr3KYsOwTeiw=
-github.com/mlplabs/mwms-core v0.0.12007 h1:vrGDFS+2rMjQbaYlwhzOr4UQZ6RorZUWq/enaUEu6qo=
-github.com/mlplabs/mwms-core v0.0.12007/go.mod h1:bghI69d5AmFKUrN7Mzdg9mcsvhuz2thEhEn4rd9c51g=
+github.com/mlplabs/mwms-core v0.0.12008 h1:kFMv9LpKAIxzsrmGaA11UX9FPFr92qh9+wIeeJNyBY4=
+github.com/mlplabs/mwms-core v0.0.12008/go.mod h1:bghI69d5AmFKUrN7Mzdg9mcsvhuz2thEhEn4rd9c51g=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
